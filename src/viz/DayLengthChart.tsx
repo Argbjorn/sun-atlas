@@ -4,7 +4,10 @@ export interface ChartPoint {
     }
 
 interface DayLengthChartProps {
-    points: ChartPoint[]
+    charts: {
+        points: ChartPoint[]
+        stroke: string
+    }[]
     width: number
     height: number
 }
@@ -23,11 +26,15 @@ function pathFromPoints(points: ChartPoint[]): string {
     return path;
 }
 
-function DayLengthChart({points, width, height}: DayLengthChartProps) {
+function DayLengthChart({charts, width, height}: DayLengthChartProps) {
     return (
         <>
             <svg width={width} height={height}>
-                <path d={pathFromPoints(points)} stroke="black" strokeWidth="2" fill="none"/>
+                {
+                    charts.map((chart) => (
+                        <path d={pathFromPoints(chart.points)} stroke={chart.stroke} strokeWidth="2" fill="none"/>
+                    ))
+                }
             </svg>
         </>
     )
