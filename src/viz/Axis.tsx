@@ -4,6 +4,7 @@ interface AxisProps {
     ticks: Tick[]
     length: number
     orientation: 'horizontal' | 'vertical'
+    tickDirection: 1 | -1
 }
 
 function toPoint(along: number, across: number, orientation: 'horizontal' | 'vertical'): ChartPoint {
@@ -18,10 +19,11 @@ function pointToString(point: ChartPoint): string {
     return pointString
 }
 
-function Axis({ ticks, length, orientation }: AxisProps) {
+function Axis({ ticks, length, orientation, tickDirection }: AxisProps) {
   const minorTickLength = 5
   const majorTickLength = 9
-  const labelOffset = 12
+  const labelOffset = 25
+
 
   let path = 'M 0 0'
   path += ' L ' + pointToString(toPoint(length, 0, orientation))
@@ -31,7 +33,7 @@ function Axis({ ticks, length, orientation }: AxisProps) {
     path += ' M '
       + pointToString(toPoint(tick.position, 0, orientation))
       + ' L '
-      + pointToString(toPoint(tick.position, tickLength, orientation))
+      + pointToString(toPoint(tick.position, tickLength * tickDirection, orientation))
   })
 
   return (
@@ -40,7 +42,7 @@ function Axis({ ticks, length, orientation }: AxisProps) {
       {ticks
         .filter((tick) => tick.label)
         .map((tick) => {
-          const labelPoint = toPoint(tick.position, majorTickLength + labelOffset, orientation)
+          const labelPoint = toPoint(tick.position, (majorTickLength + labelOffset) * tickDirection, orientation)
           return (
             <text key={tick.label} x={labelPoint.x} y={labelPoint.y}>
               {tick.label}
