@@ -1,18 +1,13 @@
-import { DateTime } from "luxon"
 import Axis from "./Axis"
-import type { Margin } from "./scale"
-import { generateTimeTicks, generateAltitudeTicks } from "./ticks"
-
-export interface ChartPoint {
-    x: number
-    y: number
-}
+import type { ChartPoint, Margin, Tick } from "./types";
 
 interface DayLengthChartProps {
     charts: {
         points: ChartPoint[]
         stroke: string
     }[]
+    xTicks: Tick[]
+    yTicks: Tick[]
     width: number
     height: number
     margin: Margin
@@ -32,7 +27,7 @@ function pathFromPoints(points: ChartPoint[]): string {
     return path;
 }
 
-function DayLengthChart({ charts, width, height, margin }: DayLengthChartProps) {
+function DayLengthChart({ charts, xTicks, yTicks, width, height, margin }: DayLengthChartProps) {
     const innerWidth = width - margin.left - margin.right
     const innerHeight = height - margin.top - margin.bottom
     return (
@@ -44,9 +39,9 @@ function DayLengthChart({ charts, width, height, margin }: DayLengthChartProps) 
                             <path d={pathFromPoints(chart.points)} stroke={chart.stroke} strokeWidth="2" fill="none" key={index} />
                         ))
                     }
-                    <Axis ticks={generateAltitudeTicks(innerHeight, 5, 2)} orientation="vertical" length={innerHeight} />
+                    <Axis ticks={yTicks} orientation="vertical" length={innerHeight} />
                     <g transform={`translate(0,${innerHeight})`}>
-                        <Axis ticks={generateTimeTicks(DateTime.now(), innerWidth, 1, 3)} orientation="horizontal" length={innerWidth} />
+                        <Axis ticks={xTicks} orientation="horizontal" length={innerWidth} />
                     </g>
                 </g>
             </svg>

@@ -1,13 +1,6 @@
 import { DateTime, Interval } from "luxon";
 import type { SunPosition } from "../domain/sunTimes";
-import type { ChartPoint } from "./DayLengthChart";
-
-export interface Margin {
-    top: number
-    right: number
-    bottom: number
-    left: number
-}
+import type { ChartPoint } from "./types";
 
 export function scaleX(time: DateTime, width: number): number {
     const timeFromDayStart: number = Interval.fromDateTimes(time.startOf('day'), time).length()

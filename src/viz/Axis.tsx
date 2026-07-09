@@ -1,9 +1,4 @@
-import type { ChartPoint } from "./DayLengthChart"
-
-export interface Tick {
-    position: number
-    label?: string
-}
+import type { ChartPoint, Tick } from "./types"
 
 interface AxisProps {
     ticks: Tick[]
@@ -47,7 +42,7 @@ function Axis({ ticks, length, orientation }: AxisProps) {
         .map((tick) => {
           const labelPoint = toPoint(tick.position, majorTickLength + labelOffset, orientation)
           return (
-            <text key={tick.position} x={labelPoint.x} y={labelPoint.y}>
+            <text key={tick.label} x={labelPoint.x} y={labelPoint.y}>
               {tick.label}
             </text>
           )
