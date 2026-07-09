@@ -3,7 +3,7 @@ export interface ChartPoint {
         y: number
     }
 
-interface DayLenghtChartProps {
+interface DayLengthChartProps {
     points: ChartPoint[]
     width: number
     height: number
@@ -16,18 +16,18 @@ function pathFromPoints(points: ChartPoint[]): string {
     let path: string = 'M ' 
     for (let i = 0; i < points.length; i++) {
         path += points[i].x + ',' + points[i].y
-        if (i != points.length) {
+        if (i != points.length - 1) {
             path += ' L '
         }
     }
     return path;
 }
 
-function DayLengthChart({points, width, height}: DayLenghtChartProps) {
+function DayLengthChart({points, width, height}: DayLengthChartProps) {
     return (
         <>
             <svg width={width} height={height}>
-                <path d={pathFromPoints(points)} stroke="black" stroke-width="2" fill="none"/>
+                <path d={pathFromPoints(points)} stroke="black" strokeWidth="2" fill="none"/>
             </svg>
         </>
     )

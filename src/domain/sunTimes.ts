@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon';
 import * as SunCalc from 'suncalc'
 
-interface SunPosition {
+export interface SunPosition {
     time: DateTime
     altitudeDeg: number
 }
@@ -24,7 +24,6 @@ export function getSunPositionSeries(date: DateTime, lat: number, lon: number, s
 
     for (let time = startPoint; time <= endPoint; time = time.plus({ minutes: stepMinutes })) {
         sunPositionSeries.push({time: time, altitudeDeg: SunCalc.getPosition(time.toJSDate(), lat, lon).altitude});
-        console.log(sunPositionSeries)
     }
     return sunPositionSeries;
 }

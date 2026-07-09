@@ -1,14 +1,23 @@
 import './App.css'
 import { DateTime } from 'luxon'
-import { getSunPositionSeries } from './domain/sunTimes'
+import { getSunPositionSeries, type SunPosition } from './domain/sunTimes'
+import type { ChartPoint } from './viz/DayLengthChart';
+import { toChartPoints } from './viz/scale';
+import DayLengthChart from './viz/DayLengthChart';
 
 function App() {
-  const sunTimes = getSunPositionSeries(DateTime.now(), 44.816245, 20.460469, 5);
-  console.log(sunTimes)
+  const lat: number = 44.816245;
+  const lon: number = 20.460469;
+  const width: number = 800;
+  const height: number = 600;
+
+  const sunTimes: SunPosition[] = getSunPositionSeries(DateTime.now(), lat, lon, 5);
+  const chartPoints: ChartPoint[] = toChartPoints(sunTimes, width, height)
+  console.log(chartPoints)
 
   return (
     <>
-      Hello, World!
+      <DayLengthChart points={chartPoints} width={width} height={height} />
     </>
   )
 }
