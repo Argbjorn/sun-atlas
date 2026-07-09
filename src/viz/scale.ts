@@ -2,12 +2,19 @@ import { DateTime, Interval } from "luxon";
 import type { SunPosition } from "../domain/sunTimes";
 import type { ChartPoint } from "./DayLengthChart";
 
-function scaleX(time: DateTime, width: number): number {
+export interface Margin {
+    top: number
+    right: number
+    bottom: number
+    left: number
+}
+
+export function scaleX(time: DateTime, width: number): number {
     const timeFromDayStart: number = Interval.fromDateTimes(time.startOf('day'), time).length()
     return timeFromDayStart / 86400000 * width
 }
 
-function scaleY(altitudeDeg: number, height: number): number {
+export function scaleY(altitudeDeg: number, height: number): number {
     return height - (altitudeDeg / 90 * height)
 }
 
