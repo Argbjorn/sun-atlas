@@ -12,7 +12,7 @@ export function scaleY(altitudeDeg: number, height: number): number {
 }
 
 export function toChartPoints(series: SunPosition[], width: number, height: number): ChartPoint[] {
-    let chartPoints: ChartPoint[] = []
+    const chartPoints: ChartPoint[] = []
     series.forEach((position) => {
         const x: number = scaleX(position.time, width);
         const y: number = scaleY(position.altitudeDeg, height);

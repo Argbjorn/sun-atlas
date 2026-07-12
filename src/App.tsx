@@ -9,8 +9,9 @@ import { useState } from 'react';
 import { generateAltitudeTicks, generateTimeTicks } from './viz/ticks';
 import { randomColor } from './viz/color';
 import { CHART_HEIGTH, CHART_MARGIN, CHART_WIDTH } from './config/chart';
+import InfoPanel from './viz/InfoPanel';
 
-interface CityEntry {
+export interface CityEntry {
   feature: PhotonFeature
   color: string
 }
@@ -27,19 +28,23 @@ function App() {
 
   const charts: { points: ChartPoint[], stroke: string }[] = [];
 
-  const xTicks = generateTimeTicks(DateTime.now(), innerWidth, 1, 3);
+  const xTicks = generateTimeTicks(DateTime.fromISO("2026-06-22"), innerWidth, 1, 3);
   const yTicks = generateAltitudeTicks(innerHeight, 5, 2);
 
   cities.map((city) => {
-    const sunTimes: SunPosition[] = getSunPositionSeries(DateTime.now(), city.feature.geometry.coordinates[1], city.feature.geometry.coordinates[0], 5);
-    const chartPoints: ChartPoint[] = toChartPoints(sunTimes, innerWidth, innerHeight);
-    charts.push({ points: chartPoints, stroke: city.color })
+    const sunTimes: SunPosition[][] = getSunPositionSeries(DateTime.now(), city.feature.geometry.coordinates[1], city.feature.geometry.coordinates[0], 5);
+    let chartPoints: ChartPoint[] = [];
+    sunTimes.forEach(segment => {
+      chartPoints = toChartPoints(segment, innerWidth, innerHeight);
+      charts.push({ points: chartPoints, stroke: city.color })
+    });
   })
 
   return (
     <>
       <CityAutocomplete onSelect={handleCitySelect} />
       <DayLengthChart charts={charts} xTicks={xTicks} yTicks={yTicks} width={CHART_WIDTH} height={CHART_HEIGTH} margin={CHART_MARGIN} />
+      <InfoPanel width={CHART_WIDTH} date={DateTime.now()} cities={cities} />
     </>
   )
 }
