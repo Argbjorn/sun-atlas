@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 
-export interface PhotonFeature{
+export interface PhotonFeature {
     properties: {
         country?: string
         name: string
@@ -12,12 +12,11 @@ export interface PhotonFeature{
     }
 }
 
-interface CityAutocompleteProps{
+interface CityAutocompleteProps {
     onSelect: (feature: PhotonFeature) => void
 }
 
-
-function CityAutocomplete({onSelect}: CityAutocompleteProps) {
+function CityAutocomplete({ onSelect }: CityAutocompleteProps) {
     const [query, setQuery] = useState('');
     const [suggestions, setSuggestions] = useState<PhotonFeature[]>([]);
 

@@ -22,11 +22,10 @@ function App() {
     setCities([...cities, { feature: feature, color: randomColor() }]);
   }
 
-
   const innerWidth = CHART_WIDTH - CHART_MARGIN.left - CHART_MARGIN.right;
   const innerHeight = CHART_HEIGTH - CHART_MARGIN.top - CHART_MARGIN.bottom;
 
-  let charts: {points: ChartPoint[], stroke: string}[] = [];
+  const charts: { points: ChartPoint[], stroke: string }[] = [];
 
   const xTicks = generateTimeTicks(DateTime.now(), innerWidth, 1, 3);
   const yTicks = generateAltitudeTicks(innerHeight, 5, 2);
@@ -34,7 +33,7 @@ function App() {
   cities.map((city) => {
     const sunTimes: SunPosition[] = getSunPositionSeries(DateTime.now(), city.feature.geometry.coordinates[1], city.feature.geometry.coordinates[0], 5);
     const chartPoints: ChartPoint[] = toChartPoints(sunTimes, innerWidth, innerHeight);
-    charts.push({points: chartPoints, stroke: city.color})
+    charts.push({ points: chartPoints, stroke: city.color })
   })
 
   return (
