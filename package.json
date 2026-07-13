@@ -13,6 +13,7 @@
     "@photostructure/tz-lookup": "^11.6.0",
     "luxon": "^3.7.2",
     "react": "^19.2.7",
+    "react-datepicker": "^9.1.0",
     "react-dom": "^19.2.7",
     "suncalc": "^2.0.0"
   },

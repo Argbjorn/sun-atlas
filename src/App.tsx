@@ -10,6 +10,8 @@ import { generateAltitudeTicks, generateTimeTicks } from './viz/ticks';
 import { randomColor } from './viz/color';
 import { CHART_HEIGTH, CHART_MARGIN, CHART_WIDTH } from './config/chart';
 import InfoPanel from './viz/InfoPanel';
+import Datepicker from 'react-datepicker';
+import "react-datepicker/dist/react-datepicker.css";
 
 export interface CityEntry {
   feature: PhotonFeature
@@ -23,16 +25,25 @@ function App() {
     setCities([...cities, { feature: feature, color: randomColor() }]);
   }
 
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+
+  const handleChange = (date: Date | null) => {
+    if (date === null) {
+      return
+    }
+    setSelectedDate(date);
+  };
+
   const innerWidth = CHART_WIDTH - CHART_MARGIN.left - CHART_MARGIN.right;
   const innerHeight = CHART_HEIGTH - CHART_MARGIN.top - CHART_MARGIN.bottom;
 
   const charts: { points: ChartPoint[], stroke: string }[] = [];
 
-  const xTicks = generateTimeTicks(DateTime.now(), innerWidth, 1, 3);
+  const xTicks = generateTimeTicks(DateTime.fromJSDate(selectedDate), innerWidth, 1, 3);
   const yTicks = generateAltitudeTicks(innerHeight, 5, 2);
 
   cities.map((city) => {
-    const sunTimes: SunPosition[][] = getSunPositionSeries(DateTime.now(), city.feature.geometry.coordinates[1], city.feature.geometry.coordinates[0], 5);
+    const sunTimes: SunPosition[][] = getSunPositionSeries(DateTime.fromJSDate(selectedDate), city.feature.geometry.coordinates[1], city.feature.geometry.coordinates[0], 5);
     let chartPoints: ChartPoint[] = [];
     sunTimes.forEach(segment => {
       chartPoints = toChartPoints(segment, innerWidth, innerHeight);
@@ -42,9 +53,12 @@ function App() {
 
   return (
     <>
-      <CityAutocomplete onSelect={handleCitySelect} />
+      <div>
+        <CityAutocomplete onSelect={handleCitySelect} />
+        <Datepicker selected={selectedDate} dateFormat={"dd.MM.yyyy"} shouldCloseOnSelect={false} calendarStartDay={1} popperPlacement="bottom-start" onChange={handleChange} />
+      </div>
       <DayLengthChart charts={charts} xTicks={xTicks} yTicks={yTicks} width={CHART_WIDTH} height={CHART_HEIGTH} margin={CHART_MARGIN} />
-      <InfoPanel width={CHART_WIDTH} date={DateTime.now()} cities={cities} />
+      <InfoPanel width={CHART_WIDTH} date={DateTime.fromJSDate(selectedDate)} cities={cities} />
     </>
   )
 }
