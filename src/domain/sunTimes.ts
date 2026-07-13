@@ -11,9 +11,6 @@ export function getSunPositionSeries(date: DateTime, lat: number, lon: number, s
     const sunPositionSeries: SunPosition[][] = [];
     const sunIntervals = getSunIntervals(date, lat, lon);
     sunIntervals.forEach(sunInterval => {
-        if (sunInterval.start === null || sunInterval.end=== null) {
-            return
-        };
         const sunPositionRange: SunPosition[] = []
         for (let time = sunInterval.start; time <= sunInterval.end; time = time.plus({ minutes: stepMinutes })) {
             sunPositionRange.push({ time: time, altitudeDeg: SunCalc.getPosition(time.toJSDate(), lat, lon).altitude });
@@ -23,31 +20,56 @@ export function getSunPositionSeries(date: DateTime, lat: number, lon: number, s
     return sunPositionSeries;
 }
 
-function getSunIntervals(date: DateTime, lat: number, lon: number): { start: DateTime | null, end: DateTime | null }[] {
+function getSunIntervals(date: DateTime, lat: number, lon: number): { start: DateTime, end: DateTime }[] {
     const timeZone = tzLookup(lat, lon);
     const sunTimes = SunCalc.getTimes(date.toJSDate(), lat, lon);
     const sunTimesDayBefore = SunCalc.getTimes(date.minus({ days: 1 }).toJSDate(), lat, lon);
-    let start1: DateTime | null = null;
-    let end1: DateTime | null = null;
-    let start2: DateTime | null = null;
-    let end2: DateTime | null = null;
-    if (sunTimes.sunrise && sunTimesDayBefore.sunset && !DateTime.fromJSDate(sunTimes.sunrise, { zone: timeZone }).hasSame(DateTime.fromJSDate(sunTimesDayBefore.sunset, { zone: timeZone }), 'day')) {
-        start1 = DateTime.fromJSDate(sunTimes.sunrise, { zone: timeZone });
-        if (sunTimes.sunset == null || !DateTime.fromJSDate(sunTimes.sunset, { zone: timeZone }).hasSame(DateTime.fromJSDate(sunTimes.sunrise, { zone: timeZone }), 'day')) {
-            end1 = date.setZone(timeZone).endOf('day');
-        } else {
-            end1 = DateTime.fromJSDate(sunTimes.sunset, { zone: timeZone })
+
+    const sunrise = toZoned(sunTimes.sunrise, timeZone);
+    const sunset = toZoned(sunTimes.sunset, timeZone);
+    const sunsetDayBefore = toZoned(sunTimesDayBefore.sunset, timeZone);
+
+    if (sunrise === null) {
+        if (sunset === null) {
+            const solarNoonAltitude = SunCalc.getPosition(sunTimes.solarNoon, lat, lon).altitude
+            if (solarNoonAltitude > 0) {
+                const start = date.setZone(timeZone).startOf('day');
+                const end = date.setZone(timeZone).endOf('day');
+                return [{ start: start, end: end }]
+            } else {
+                return []
+            }
         }
-    } else if (sunTimes.sunrise && sunTimesDayBefore.sunset && DateTime.fromJSDate(sunTimes.sunrise, { zone: timeZone }).hasSame(DateTime.fromJSDate(sunTimesDayBefore.sunset, { zone: timeZone }), 'day')) {
-        start1 = date.setZone(timeZone).startOf('day');
-        end1 = DateTime.fromJSDate(sunTimesDayBefore.sunset, { zone: timeZone });
-        start2 = DateTime.fromJSDate(sunTimes.sunrise, { zone: timeZone });
-        if (sunTimes.sunset == null || !DateTime.fromJSDate(sunTimes.sunset, { zone: timeZone }).hasSame(DateTime.fromJSDate(sunTimes.sunrise, { zone: timeZone }), 'day')) {
-            end2 = date.setZone(timeZone).endOf('day');
-        } else {
-            end2 = DateTime.fromJSDate(sunTimes.sunset, { zone: timeZone })
-        }
+        const start = date.setZone(timeZone).startOf('day');
+        const end = sunset;
+        return [{ start: start, end: end }]
     }
-    console.log(`start1: ${start1}, end1: ${end1}, start2: ${start2}, end2: ${end2}`)
-    return [{ start: start1, end: end1 }, { start: start2, end: end2 }]
+
+    /**Returns true if yesterday sunset happens in the current day */
+    const isSpillover = sunsetDayBefore !== null && sunrise.hasSame(sunsetDayBefore, 'day');
+    const sunIntervals = []
+
+    if (isSpillover) {
+        sunIntervals.push({ start: date.setZone(timeZone).startOf('day'), end: sunsetDayBefore });
+    }
+
+    sunIntervals.push({ start: sunrise, end: resolveEnd(sunset, sunrise, date, timeZone) })
+
+    return sunIntervals
+}
+
+function toZoned(date: Date | null, zone: string): DateTime | null {
+    if (date) {
+        return DateTime.fromJSDate(date, { zone: zone })
+    } else {
+        return null
+    }
+}
+
+function resolveEnd(sunset: DateTime | null, referenceMoment: DateTime, date: DateTime, timezone: string) {
+    if (sunset !== null && referenceMoment.hasSame(sunset, 'day')) {
+        return sunset
+    } else {
+        return date.setZone(timezone).endOf('day')
+    }
 }

@@ -28,7 +28,7 @@ function App() {
 
   const charts: { points: ChartPoint[], stroke: string }[] = [];
 
-  const xTicks = generateTimeTicks(DateTime.fromISO("2026-06-22"), innerWidth, 1, 3);
+  const xTicks = generateTimeTicks(DateTime.now(), innerWidth, 1, 3);
   const yTicks = generateAltitudeTicks(innerHeight, 5, 2);
 
   cities.map((city) => {
