@@ -12,9 +12,10 @@ export function getSunPositionSeries(date: DateTime, lat: number, lon: number, s
     const sunIntervals = getSunIntervals(date, lat, lon);
     sunIntervals.forEach(sunInterval => {
         const sunPositionRange: SunPosition[] = []
-        for (let time = sunInterval.start; time <= sunInterval.end; time = time.plus({ minutes: stepMinutes })) {
+        for (let time = sunInterval.start; time < sunInterval.end; time = time.plus({ minutes: stepMinutes })) {
             sunPositionRange.push({ time: time, altitudeDeg: SunCalc.getPosition(time.toJSDate(), lat, lon).altitude });
         };
+        sunPositionRange.push({ time: sunInterval.end, altitudeDeg: SunCalc.getPosition(sunInterval.end.toJSDate(), lat, lon).altitude })
         sunPositionSeries.push(sunPositionRange);
     })
     return sunPositionSeries;
