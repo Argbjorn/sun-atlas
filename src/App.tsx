@@ -39,7 +39,7 @@ function App() {
 
   const charts: { points: ChartPoint[], stroke: string }[] = [];
 
-  const xTicks = generateTimeTicks(DateTime.fromJSDate(selectedDate), innerWidth, 1, 3);
+  const xTicks = generateTimeTicks(DateTime.fromJSDate(selectedDate), innerWidth, 1, 1);
   const yTicks = generateAltitudeTicks(innerHeight, 5, 2);
 
   cities.map((city) => {

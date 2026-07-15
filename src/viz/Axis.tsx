@@ -11,7 +11,9 @@ interface AxisProps {
 function Axis({ ticks, length, orientation, tickDirection }: AxisProps) {
   const minorTickLength = 5
   const majorTickLength = 9
-  const labelOffset = 25
+  const labelOffsetX = 10
+  const labelOffsetY = 25
+  const labelOffset = orientation === 'horizontal' ? labelOffsetX : labelOffsetY
 
 
   let path = 'M 0 0'
@@ -32,8 +34,16 @@ function Axis({ ticks, length, orientation, tickDirection }: AxisProps) {
         .filter((tick) => tick.label)
         .map((tick) => {
           const labelPoint = toPoint(tick.position, (majorTickLength + labelOffset) * tickDirection, orientation)
+          const textAnchor = orientation === 'horizontal' ? 'middle' : (tickDirection === 1 ? 'end' : 'start')
+          const dominantBaseline = orientation === 'horizontal' ? (tickDirection === 1 ? 'hanging' : 'auto') : 'middle'
           return (
-            <text key={tick.label} x={labelPoint.x} y={labelPoint.y}>
+            <text
+              key={tick.label}
+              x={labelPoint.x}
+              y={labelPoint.y}
+              textAnchor={textAnchor}
+              dominantBaseline={dominantBaseline}
+            >
               {tick.label}
             </text>
           )

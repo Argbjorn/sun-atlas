@@ -11,7 +11,7 @@ export function generateTimeTicks(referenceDate: DateTime, width: number, stepHo
         const position = h === 24 ? width : scaleX(t, width)
         ticks.push({
             position: position,
-            label: (h / stepHours) % labelEveryNth === 0 ? (h === 24 ? '24:00' : t.toFormat('HH:mm')) : undefined
+            label: (h / stepHours) % labelEveryNth === 0 ? (h === 24 ? '24' : t.toFormat('HH')) : undefined
         })
     }
     return ticks
