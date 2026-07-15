@@ -1,22 +1,11 @@
-import type { ChartPoint, Tick } from "./types"
+import { pointToString, toPoint } from "./geometry"
+import type { Tick } from "./types"
 
 interface AxisProps {
     ticks: Tick[]
     length: number
     orientation: 'horizontal' | 'vertical'
     tickDirection: 1 | -1
-}
-
-function toPoint(along: number, across: number, orientation: 'horizontal' | 'vertical'): ChartPoint {
-    return orientation === 'horizontal'
-        ? { x: along, y: across }
-        : { x: across, y: along }
-}
-
-function pointToString(point: ChartPoint): string {
-    let pointString = ''
-    pointString += point.x + ' ' + point.y
-    return pointString
 }
 
 function Axis({ ticks, length, orientation, tickDirection }: AxisProps) {

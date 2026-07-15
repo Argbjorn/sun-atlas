@@ -1,4 +1,5 @@
 import Axis from "./Axis"
+import ChartGrid from "./ChartGrid";
 import type { ChartPoint, Margin, Tick } from "./types";
 
 interface DayLengthChartProps {
@@ -43,6 +44,7 @@ function DayLengthChart({ charts, xTicks, yTicks, width, height, margin }: DayLe
                     <g transform={`translate(0,${innerHeight})`}>
                         <Axis ticks={xTicks} orientation="horizontal" length={innerWidth} tickDirection={1} />
                     </g>
+                    <ChartGrid width={innerWidth} heigth={innerHeight} ticks={{xTicks: xTicks, yTicks: yTicks}} showXTicks={'all'} showYTicks={'onlyLabeled'} />
                 </g>
             </svg>
         </>
