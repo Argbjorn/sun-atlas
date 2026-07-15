@@ -1,14 +1,14 @@
 import './App.css'
 import { DateTime } from 'luxon'
 import { getSunPositionSeries, type SunPosition } from './domain/sunTimes'
-import type { ChartPoint } from './viz/lib/types';
+import type { ChartPoint, WindowSize } from './viz/lib/types';
 import { toChartPoints } from './viz/lib/scale';
 import DayLengthChart from './viz/DayLengthChart';
 import CityAutocomplete, { type PhotonFeature } from './ui/CityAutocomplete';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { generateAltitudeTicks, generateTimeTicks } from './viz/lib/ticks';
 import { randomColor } from './viz/lib/color';
-import { CHART_HEIGTH, CHART_MARGIN, CHART_WIDTH } from './config/chart';
+import { CHART_MARGIN } from './config/chart';
 import InfoPanel from './ui/InfoPanel';
 import Datepicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
@@ -34,8 +34,24 @@ function App() {
     setSelectedDate(date);
   };
 
-  const innerWidth = CHART_WIDTH - CHART_MARGIN.left - CHART_MARGIN.right;
-  const innerHeight = CHART_HEIGTH - CHART_MARGIN.top - CHART_MARGIN.bottom;
+  const [windowSize, setWindowSize] = useState<WindowSize>({ width: window.innerWidth * 0.9, height: window.innerHeight * 0.8 });
+
+  useEffect(() => {
+    let timeout: ReturnType<typeof setTimeout>;
+    function handleResize() {
+      timeout = setTimeout(() => {
+        setWindowSize({ width: window.innerWidth * 0.9, height: window.innerHeight * 0.8 })
+      }, 300)
+    }
+    window.addEventListener('resize', handleResize);
+    return () => {
+      clearTimeout(timeout);
+      window.removeEventListener('resize', handleResize);
+    }
+  }, [windowSize]);
+
+  const innerWidth = windowSize.width - CHART_MARGIN.left - CHART_MARGIN.right;
+  const innerHeight = windowSize.height - CHART_MARGIN.top - CHART_MARGIN.bottom;
 
   const charts: { points: ChartPoint[], stroke: string }[] = [];
 
@@ -57,8 +73,8 @@ function App() {
         <CityAutocomplete onSelect={handleCitySelect} />
         <Datepicker selected={selectedDate} dateFormat={"dd.MM.yyyy"} shouldCloseOnSelect={false} calendarStartDay={1} popperPlacement="bottom-start" onChange={handleChange} />
       </div>
-      <DayLengthChart charts={charts} xTicks={xTicks} yTicks={yTicks} width={CHART_WIDTH} height={CHART_HEIGTH} margin={CHART_MARGIN} />
-      <InfoPanel width={CHART_WIDTH} date={DateTime.fromJSDate(selectedDate)} cities={cities} />
+      <DayLengthChart charts={charts} xTicks={xTicks} yTicks={yTicks} width={windowSize.width} height={windowSize.height} margin={CHART_MARGIN} />
+      <InfoPanel width={windowSize.width} date={DateTime.fromJSDate(selectedDate)} cities={cities} />
     </>
   )
 }
