@@ -1,5 +1,5 @@
-import { pointToString, toPoint } from "./geometry"
-import type { Tick } from "./types"
+import { pointToString, toPoint } from "./lib/geometry"
+import type { Tick } from "./lib/types"
 
 interface AxisProps {
     ticks: Tick[]

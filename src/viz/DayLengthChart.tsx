@@ -1,6 +1,6 @@
 import Axis from "./Axis"
 import ChartGrid from "./ChartGrid";
-import type { ChartPoint, Margin, Tick } from "./types";
+import type { ChartPoint, Margin, Tick } from "./lib/types";
 
 interface DayLengthChartProps {
     charts: {

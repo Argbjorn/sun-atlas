@@ -1,15 +1,15 @@
 import './App.css'
 import { DateTime } from 'luxon'
 import { getSunPositionSeries, type SunPosition } from './domain/sunTimes'
-import type { ChartPoint } from './viz/types';
-import { toChartPoints } from './viz/scale';
+import type { ChartPoint } from './viz/lib/types';
+import { toChartPoints } from './viz/lib/scale';
 import DayLengthChart from './viz/DayLengthChart';
-import CityAutocomplete, { type PhotonFeature } from './viz/CityAutocomplete';
+import CityAutocomplete, { type PhotonFeature } from './ui/CityAutocomplete';
 import { useState } from 'react';
-import { generateAltitudeTicks, generateTimeTicks } from './viz/ticks';
-import { randomColor } from './viz/color';
+import { generateAltitudeTicks, generateTimeTicks } from './viz/lib/ticks';
+import { randomColor } from './viz/lib/color';
 import { CHART_HEIGTH, CHART_MARGIN, CHART_WIDTH } from './config/chart';
-import InfoPanel from './viz/InfoPanel';
+import InfoPanel from './ui/InfoPanel';
 import Datepicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 

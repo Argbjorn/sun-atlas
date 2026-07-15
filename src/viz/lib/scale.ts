@@ -1,5 +1,5 @@
 import { DateTime, Interval } from "luxon";
-import type { SunPosition } from "../domain/sunTimes";
+import type { SunPosition } from "../../domain/sunTimes";
 import type { ChartPoint } from "./types";
 
 export function scaleX(time: DateTime, width: number): number {
