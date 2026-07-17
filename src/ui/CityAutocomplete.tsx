@@ -1,16 +1,5 @@
 import { useState, useEffect } from "react"
-
-export interface PhotonFeature {
-    properties: {
-        country?: string
-        name: string
-        osm_id: number
-        state?: string
-    }
-    geometry: {
-        coordinates: [number, number]
-    }
-}
+import type { PhotonFeature } from "../viz/lib/types";
 
 interface CityAutocompleteProps {
     onSelect: (feature: PhotonFeature) => void

@@ -1,4 +1,4 @@
-import { DateTime } from 'luxon';
+import { DateTime, Duration } from 'luxon';
 import * as SunCalc from 'suncalc'
 import tzLookup from '@photostructure/tz-lookup';
 
@@ -21,6 +21,42 @@ export function getSunPositionSeries(date: DateTime, lat: number, lon: number, s
     return sunPositionSeries;
 }
 
+export function getSunSummary(date: DateTime, lat: number, lon: number): {sunrise: DateTime | null, sunset: DateTime | null, solarNoonTime: DateTime | null, solarNoonDeg: number | null, dayLength: Duration | null } {
+    const timeZone = tzLookup(lat, lon);
+    const sunTimes = SunCalc.getTimes(date.toJSDate(), lat, lon);
+    const sunrise = toZoned(sunTimes.sunrise, timeZone);
+    const sunset = toZoned(sunTimes.sunset, timeZone);
+    const solarNoonTime = toZoned(sunTimes.solarNoon, timeZone);
+    const solarNoonDeg = solarNoonTime ? SunCalc.getPosition(solarNoonTime.toJSDate(), lat, lon).altitude : null;
+    const polarDay = isPolarDay(solarNoonTime, lat, lon);
+    const dayLength = getDayLength(sunrise, sunset, polarDay);
+
+    return {
+        sunrise: sunrise,
+        sunset: sunset,
+        solarNoonTime: solarNoonTime,
+        solarNoonDeg: solarNoonDeg,
+        dayLength: dayLength
+    }
+}
+
+function getDayLength(sunrise: DateTime | null, sunset: DateTime | null, isPolarDay: boolean): Duration | null {
+    if (sunrise && sunset) {
+        return sunset.diff(sunrise)
+    }
+    return isPolarDay ? Duration.fromObject({ hours: 24 }) : Duration.fromObject({ hours: 0 })
+}
+
+function isPolarDay(solarNoon: DateTime | null, lat: number, lon: number): boolean {
+    if (solarNoon) {
+        const solarNoonAltitude = SunCalc.getPosition(solarNoon.toJSDate(), lat, lon).altitude;
+        return solarNoonAltitude > 0
+    }
+    return false
+    
+    
+}
+
 function getSunIntervals(date: DateTime, lat: number, lon: number): { start: DateTime, end: DateTime }[] {
     const timeZone = tzLookup(lat, lon);
     const sunTimes = SunCalc.getTimes(date.toJSDate(), lat, lon);
@@ -32,8 +68,7 @@ function getSunIntervals(date: DateTime, lat: number, lon: number): { start: Dat
 
     if (sunrise === null) {
         if (sunset === null) {
-            const solarNoonAltitude = SunCalc.getPosition(sunTimes.solarNoon, lat, lon).altitude
-            if (solarNoonAltitude > 0) {
+            if (isPolarDay(toZoned(sunTimes.solarNoon, timeZone), lat, lon)) {
                 const start = date.setZone(timeZone).startOf('day');
                 const end = date.setZone(timeZone).endOf('day');
                 return [{ start: start, end: end }]

@@ -3,11 +3,28 @@ export interface ChartPoint {
     y: number
 }
 
+export interface CityEntry {
+  feature: PhotonFeature
+  color: string
+}
+
 export interface Margin {
     top: number
     right: number
     bottom: number
     left: number
+}
+
+export interface PhotonFeature {
+    properties: {
+        country?: string
+        name: string
+        osm_id: number
+        state?: string
+    }
+    geometry: {
+        coordinates: [number, number]
+    }
 }
 
 export interface Tick {
