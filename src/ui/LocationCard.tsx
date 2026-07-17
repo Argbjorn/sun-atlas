@@ -1,7 +1,9 @@
+import { useEffect, useRef, useState } from "react"
 import type { DateTime } from "luxon"
 import type { CityEntry, PhotonFeature } from "../viz/lib/types"
 import { getSunSummary } from "../domain/sunTimes"
 import CityAutocomplete from "./CityAutocomplete"
+import styles from "./LocationCard.module.css"
 
 interface LocationCardProps {
     role: 'primary' | 'secondary'
@@ -12,11 +14,34 @@ interface LocationCardProps {
 }
 
 function LocationCard({ role, city, date, onSelect, onRemove }: LocationCardProps) {
+    const [isSearching, setIsSearching] = useState(false)
+    const cardRef = useRef<HTMLDivElement>(null)
+
+    useEffect(() => {
+        if (!isSearching) {
+            return
+        }
+        function handleClickOutside(event: MouseEvent) {
+            if (cardRef.current && !cardRef.current.contains(event.target as Node)) {
+                setIsSearching(false)
+            }
+        }
+        document.addEventListener('mousedown', handleClickOutside)
+        return () => document.removeEventListener('mousedown', handleClickOutside)
+    }, [isSearching])
+
     if (!city) {
         return (
-            <div>
-                <span>{role === 'primary' ? 'Primary' : 'Secondary'}</span>
-                <CityAutocomplete onSelect={onSelect} />
+            <div className={styles.card} ref={cardRef}>
+                {isSearching ? (
+                    <div className={styles.searchOverlay}>
+                        <CityAutocomplete onSelect={onSelect} />
+                    </div>
+                ) : (
+                    <button className={styles.placeholder} onClick={() => setIsSearching(true)}>
+                        {role === 'primary' ? 'Select location' : 'Select location to compare'}
+                    </button>
+                )}
             </div>
         )
     }
@@ -28,36 +53,36 @@ function LocationCard({ role, city, date, onSelect, onRemove }: LocationCardProp
     )
 
     return (
-        <div>
-            <span style={{ color: city.color }}>●</span>
-            <span>
-                {city.feature.properties.name}
-                {city.feature.properties.state && `, ${city.feature.properties.state}`}
-                {city.feature.properties.country && `, ${city.feature.properties.country}`}
-            </span>
-            <span>{role === 'primary' ? 'Primary' : 'Secondary'}</span>
-            {role === 'secondary' && <button onClick={onRemove}>×</button>}
+        <div className={styles.card}>
+            <div className={styles.header}>
+                <span className={styles.dot} style={{ color: city.color }}>●</span>
+                <span className={styles.title}>
+                    {city.feature.properties.name}
+                    {city.feature.properties.country && `, ${city.feature.properties.country}`}
+                </span>
+                {role === 'secondary' && <button className={styles.closeButton} onClick={onRemove}>×</button>}
+            </div>
 
-            <div>
+            <div className={styles.coords}>
                 {city.feature.geometry.coordinates[1].toFixed(2)}°, {city.feature.geometry.coordinates[0].toFixed(2)}°
             </div>
 
-            <div>
-                <div>
-                    <span>Sunrise</span>
-                    <span>{sunrise ? sunrise.toFormat('HH:mm') : '—'}</span>
+            <div className={styles.stats}>
+                <div className={styles.stat}>
+                    <span className={styles.statLabel}>Sunrise</span>
+                    <span className={styles.statValue}>{sunrise ? sunrise.toFormat('HH:mm') : '—'}</span>
                 </div>
-                <div>
-                    <span>Sunset</span>
-                    <span>{sunset ? sunset.toFormat('HH:mm') : '—'}</span>
+                <div className={styles.stat}>
+                    <span className={styles.statLabel}>Sunset</span>
+                    <span className={styles.statValue}>{sunset ? sunset.toFormat('HH:mm') : '—'}</span>
                 </div>
-                <div>
-                    <span>Solar noon</span>
-                    <span>{solarNoonDeg !== null ? `${Math.round(solarNoonDeg)}°` : '—'}</span>
+                <div className={styles.stat}>
+                    <span className={styles.statLabel}>Solar noon</span>
+                    <span className={styles.statValue}>{solarNoonDeg !== null ? `${Math.round(solarNoonDeg)}°` : '—'}</span>
                 </div>
-                <div>
-                    <span>Day length</span>
-                    <span>{dayLength ? dayLength.shiftTo('hours', 'minutes').toFormat("h'h' mm'm'") : '—'}</span>
+                <div className={styles.stat}>
+                    <span className={styles.statLabel}>Day length</span>
+                    <span className={styles.statValue}>{dayLength ? dayLength.shiftTo('hours', 'minutes').toFormat("h'h' mm'm'") : '—'}</span>
                 </div>
             </div>
         </div>

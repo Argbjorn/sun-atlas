@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import type { PhotonFeature } from "../viz/lib/types";
+import styles from "./CityAutocomplete.module.css"
 
 interface CityAutocompleteProps {
     onSelect: (feature: PhotonFeature) => void
@@ -23,9 +24,19 @@ function CityAutocomplete({ onSelect }: CityAutocompleteProps) {
     }, [query]);
 
     return (
-        <div>
-            <input value={query} onChange={e => setQuery(e.target.value)} />
-            {suggestions.length > 0 && <ul>{suggestions.map(feature => <li key={feature.properties.osm_id} onClick={() => onSelect(feature)}>{feature.properties.name}{feature.properties.state && `, ${feature.properties.state}`}{feature.properties.country && `, ${feature.properties.country}`} </li>)}</ul>}
+        <div className={styles.wrapper}>
+            <input className={styles.input} autoFocus value={query} onChange={e => setQuery(e.target.value)} />
+            {suggestions.length > 0 && (
+                <ul className={styles.suggestions}>
+                    {suggestions.map(feature => (
+                        <li className={styles.suggestion} key={feature.properties.osm_id} onClick={() => onSelect(feature)}>
+                            {feature.properties.name}
+                            {feature.properties.state && `, ${feature.properties.state}`}
+                            {feature.properties.country && `, ${feature.properties.country}`}
+                        </li>
+                    ))}
+                </ul>
+            )}
         </div>
     )
 }

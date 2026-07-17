@@ -1,6 +1,8 @@
 import Axis from "./Axis"
 import ChartGrid from "./ChartGrid";
 import type { ChartPoint, Margin, Tick } from "./lib/types";
+import styles from "./DayLengthChart.module.css"
+import { CHART_GRID_COLOR, CHART_GRID_COLOR_FAINT } from "../config/chartTheme";
 
 interface DayLengthChartProps {
     charts: {
@@ -32,9 +34,21 @@ function DayLengthChart({ charts, xTicks, yTicks, width, height, margin }: DayLe
     const innerWidth = width - margin.left - margin.right
     const innerHeight = height - margin.top - margin.bottom
     return (
-        <>
+        <div className={styles.panel}>
+            <div className={styles.instrumentLabel}>Высота солнца, ° над горизонтом</div>
             <svg width={width} height={height}>
                 <g transform={`translate(${margin.left},${margin.top})`}>
+                    <ChartGrid
+                        width={innerWidth}
+                        heigth={innerHeight}
+                        ticks={{ xTicks: xTicks, yTicks: yTicks }}
+                        showXTicks={'all'}
+                        showYTicks={'onlyLabeled'}
+                        style={{
+                            main: { color: CHART_GRID_COLOR, strokeWidth: 1 },
+                            secondary: { color: CHART_GRID_COLOR_FAINT, strokeWidth: 0.5 },
+                        }}
+                    />
                     {
                         charts.map((chart, index) => (
                             <path d={pathFromPoints(chart.points)} stroke={chart.stroke} strokeWidth="2" fill="none" key={index} />
@@ -44,10 +58,9 @@ function DayLengthChart({ charts, xTicks, yTicks, width, height, margin }: DayLe
                     <g transform={`translate(0,${innerHeight})`}>
                         <Axis ticks={xTicks} orientation="horizontal" length={innerWidth} tickDirection={1} />
                     </g>
-                    <ChartGrid width={innerWidth} heigth={innerHeight} ticks={{xTicks: xTicks, yTicks: yTicks}} showXTicks={'all'} showYTicks={'onlyLabeled'} />
                 </g>
             </svg>
-        </>
+        </div>
     )
 }
 

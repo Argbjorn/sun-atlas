@@ -1,5 +1,6 @@
 import { pointToString, toPoint } from "./lib/geometry"
 import type { Tick } from "./lib/types"
+import styles from "./Axis.module.css"
 
 interface AxisProps {
     ticks: Tick[]
@@ -29,7 +30,7 @@ function Axis({ ticks, length, orientation, tickDirection }: AxisProps) {
 
   return (
     <g>
-      <path d={path} stroke="black" strokeWidth="1" fill="none" />
+      <path className={styles.axisLine} d={path} strokeWidth="1" fill="none" />
       {ticks
         .filter((tick) => tick.label)
         .map((tick) => {
@@ -38,6 +39,7 @@ function Axis({ ticks, length, orientation, tickDirection }: AxisProps) {
           const dominantBaseline = orientation === 'horizontal' ? (tickDirection === 1 ? 'hanging' : 'auto') : 'middle'
           return (
             <text
+              className={styles.axisLabel}
               key={tick.label}
               x={labelPoint.x}
               y={labelPoint.y}

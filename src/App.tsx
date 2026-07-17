@@ -1,4 +1,4 @@
-import './App.css'
+import styles from './App.module.css'
 import { DateTime } from 'luxon'
 import { getSunPositionSeries, type SunPosition } from './domain/sunTimes'
 import type { ChartPoint, CityEntry, PhotonFeature, WindowSize } from './viz/lib/types';
@@ -7,10 +7,9 @@ import DayLengthChart from './viz/DayLengthChart';
 import { useEffect, useState } from 'react';
 import { generateAltitudeTicks, generateTimeTicks } from './viz/lib/ticks';
 import { randomColor } from './viz/lib/color';
-import { CHART_MARGIN } from './config/chart';
-import Datepicker from 'react-datepicker';
+import { CHART_MARGIN, CHART_PANEL_INSET, CONTENT_MAX_WIDTH } from './config/chart';
 import "react-datepicker/dist/react-datepicker.css";
-import LocationCard from './ui/LocationCard';
+import ControlPanel from './ui/ControlPanel';
 
 
 
@@ -34,13 +33,13 @@ function App() {
     setCities(prev => ({ ...prev, [role]: null }))
   }
 
-  const [windowSize, setWindowSize] = useState<WindowSize>({ width: window.innerWidth * 0.9, height: window.innerHeight * 0.8 });
+  const [windowSize, setWindowSize] = useState<WindowSize>({ width: Math.min(window.innerWidth, CONTENT_MAX_WIDTH), height: window.innerHeight * 0.8 });
 
   useEffect(() => {
     let timeout: ReturnType<typeof setTimeout>;
     function handleResize() {
       timeout = setTimeout(() => {
-        setWindowSize({ width: window.innerWidth * 0.9, height: window.innerHeight * 0.8 })
+        setWindowSize({ width: Math.min(window.innerWidth, CONTENT_MAX_WIDTH), height: window.innerHeight * 0.8 })
       }, 300)
     }
     window.addEventListener('resize', handleResize);
@@ -50,8 +49,10 @@ function App() {
     }
   }, [windowSize]);
 
-  const innerWidth = windowSize.width - CHART_MARGIN.left - CHART_MARGIN.right;
-  const innerHeight = windowSize.height - CHART_MARGIN.top - CHART_MARGIN.bottom;
+  const chartWidth = windowSize.width - CHART_PANEL_INSET;
+  const chartHeight = windowSize.height * 0.7;
+  const innerWidth = chartWidth - CHART_MARGIN.left - CHART_MARGIN.right;
+  const innerHeight = chartHeight - CHART_MARGIN.top - CHART_MARGIN.bottom;
 
   const charts: { points: ChartPoint[], stroke: string }[] = [];
 
@@ -70,14 +71,22 @@ function App() {
     })
 
   return (
-    <>
-      <div>
-        <Datepicker selected={selectedDate} dateFormat={"dd.MM.yyyy"} shouldCloseOnSelect={false} calendarStartDay={1} popperPlacement="bottom-start" onChange={handleChange} />
-      </div>
-      <DayLengthChart charts={charts} xTicks={xTicks} yTicks={yTicks} width={windowSize.width} height={windowSize.height} margin={CHART_MARGIN} />
-      <LocationCard role={'primary'} city={cities.primary} date={DateTime.fromJSDate(selectedDate)} onSelect={(feature) => handleCitySelect('primary', feature)} />
-      <LocationCard role={'secondary'} city={cities.secondary} date={DateTime.fromJSDate(selectedDate)} onSelect={(feature) => handleCitySelect('secondary', feature)} onRemove={() => handleCityRemove('secondary')} />
-    </>
+    <div className={styles.page}>
+      <ControlPanel
+        cities={cities}
+        selectedDate={selectedDate}
+        onCitySelect={handleCitySelect}
+        onCityRemove={handleCityRemove}
+        onDateChange={handleChange}
+      />
+      <DayLengthChart
+      charts={charts}
+      xTicks={xTicks}
+      yTicks={yTicks}
+      width={chartWidth}
+      height={chartHeight}
+      margin={CHART_MARGIN} />
+    </div>
   )
 }
 

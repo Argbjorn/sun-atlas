@@ -1,0 +1,12 @@
+.axisLine {
+    stroke: var(--color-text-faint);
+    stroke-width: 1;
+}
+
+.axisLabel {
+    fill: var(--color-chart-label);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}

@@ -1,0 +1,14 @@
+.panel {
+    border: 1px solid var(--color-panel-border);
+    background: #0a2138;
+    padding: var(--spacing-3) var(--spacing-4) 0;
+}
+
+.instrumentLabel {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-chart-label);
+    margin-bottom: var(--spacing-2);
+}
