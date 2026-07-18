@@ -30,7 +30,12 @@ function App() {
   };
 
   function handleCityRemove(role: 'primary' | 'secondary') {
-    setCities(prev => ({ ...prev, [role]: null }))
+    if (role === 'primary') {
+      setCities(prev => ({primary: prev.secondary, secondary: null}))
+    } else {
+      setCities(prev => ({ ...prev, [role]: null }))
+    }
+    
   }
 
   const [windowSize, setWindowSize] = useState<WindowSize>({ width: Math.min(window.innerWidth, CONTENT_MAX_WIDTH), height: window.innerHeight * 0.8 });

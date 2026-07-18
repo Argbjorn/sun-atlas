@@ -60,7 +60,7 @@ function LocationCard({ role, city, date, onSelect, onRemove }: LocationCardProp
                     {city.feature.properties.name}
                     {city.feature.properties.country && `, ${city.feature.properties.country}`}
                 </span>
-                {role === 'secondary' && <button className={styles.closeButton} onClick={onRemove}>×</button>}
+                <button className={styles.closeButton} onClick={onRemove}>×</button>
             </div>
 
             <div className={styles.coords}>
