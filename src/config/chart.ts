@@ -1,4 +1,4 @@
-export const CHART_MARGIN = { top: 20, right: 50, bottom: 40, left: 50 };
+export const CHART_MARGIN = { top: 20, right: 20, bottom: 40, left: 50 };
 export const CONTENT_MAX_WIDTH = 920;
 
 // Horizontal padding + border of DayLengthChart's .panel (src/viz/DayLengthChart.module.css) — kept

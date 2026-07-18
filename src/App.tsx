@@ -14,7 +14,24 @@ import ControlPanel from './ui/ControlPanel';
 
 
 function App() {
-  const [cities, setCities] = useState<{ primary: CityEntry | null, secondary: CityEntry | null }>({ primary: null, secondary: null })
+  const defaultCityEntry: CityEntry = {
+    feature: {
+      properties: {
+        name: "Belgrade",
+        state: "Central Serbia",
+        country: "Serbia",
+        osm_id: 60571493
+      },
+      geometry: {
+        "coordinates": [
+          20.4568974,
+          44.8178131
+        ]
+      }
+    },
+    color: randomColor()
+  }
+  const [cities, setCities] = useState<{ primary: CityEntry | null, secondary: CityEntry | null }>({ primary: defaultCityEntry, secondary: null })
 
   function handleCitySelect(role: 'primary' | 'secondary', feature: PhotonFeature) {
     setCities(prev => ({ ...prev, [role]: { feature, color: randomColor() } }))
@@ -31,11 +48,11 @@ function App() {
 
   function handleCityRemove(role: 'primary' | 'secondary') {
     if (role === 'primary') {
-      setCities(prev => ({primary: prev.secondary, secondary: null}))
+      setCities(prev => ({ primary: prev.secondary, secondary: null }))
     } else {
       setCities(prev => ({ ...prev, [role]: null }))
     }
-    
+
   }
 
   const [pageWidth, setPageWidth] = useState<number>(Math.min(window.innerWidth, CONTENT_MAX_WIDTH));
@@ -85,12 +102,12 @@ function App() {
         onDateChange={handleChange}
       />
       <DayLengthChart
-      charts={charts}
-      xTicks={xTicks}
-      yTicks={yTicks}
-      width={chartWidth}
-      height={chartHeight}
-      margin={CHART_MARGIN} />
+        charts={charts}
+        xTicks={xTicks}
+        yTicks={yTicks}
+        width={chartWidth}
+        height={chartHeight}
+        margin={CHART_MARGIN} />
     </div>
   )
 }
