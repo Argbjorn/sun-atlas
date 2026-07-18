@@ -1,3 +1,5 @@
+@import "react-datepicker/dist/react-datepicker.css";
+
 :root {
   /* Blueprint theme — cyanotype palette (saturated Prussian blue, not navy-black) */
   --color-bg: #0a2f5e;
@@ -32,6 +34,13 @@
 
 * {
   box-sizing: border-box;
+}
+
+html {
+  /* Reserves the scrollbar's width permanently, so content opening below the fold
+     (e.g. the date picker calendar) doesn't trigger a viewport-width change that
+     re-centers the page and shifts everything sideways. */
+  scrollbar-gutter: stable;
 }
 
 body {

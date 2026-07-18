@@ -8,7 +8,6 @@ import { useEffect, useState } from 'react';
 import { generateAltitudeTicks, generateTimeTicks } from './viz/lib/ticks';
 import { randomColor } from './viz/lib/color';
 import { CHART_ASPECT_RATIO, CHART_ASPECT_RATIO_MOBILE, CHART_MARGIN, CHART_PANEL_INSET, CONTENT_MAX_WIDTH, MOBILE_BREAKPOINT } from './config/chart';
-import "react-datepicker/dist/react-datepicker.css";
 import ControlPanel from './ui/ControlPanel';
 
 

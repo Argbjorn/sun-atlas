@@ -1,8 +1,7 @@
 import { DateTime } from "luxon"
 import type { CityEntry, PhotonFeature } from "../viz/lib/types"
 import LocationCard from "./LocationCard"
-import Datepicker from "react-datepicker"
-import "react-datepicker/dist/react-datepicker.css"
+import DatePickerPanel from "./DatePickerPanel"
 import styles from "./ControlPanel.module.css"
 
 interface ControlPanelProps {
@@ -34,16 +33,7 @@ function ControlPanel({ cities, selectedDate, onCitySelect, onCityRemove, onDate
                     onRemove={() => onCityRemove('secondary')}
                 />
             </div>
-            <div className={styles.dateRow}>
-                <Datepicker
-                    selected={selectedDate}
-                    dateFormat={"dd.MM.yyyy"}
-                    shouldCloseOnSelect={false}
-                    calendarStartDay={1}
-                    popperPlacement="bottom-start"
-                    onChange={onDateChange}
-                />
-            </div>
+            <DatePickerPanel selectedDate={selectedDate} onDateChange={onDateChange} />
         </div>
     )
 }
