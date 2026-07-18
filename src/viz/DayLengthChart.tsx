@@ -54,7 +54,7 @@ function DayLengthChart({ charts, xTicks, yTicks, width, height, margin }: DayLe
                             <path d={pathFromPoints(chart.points)} stroke={chart.stroke} strokeWidth="2" fill="none" key={index} />
                         ))
                     }
-                    <Axis ticks={yTicks} orientation="vertical" length={innerHeight} tickDirection={-1} />
+                    <Axis ticks={yTicks} orientation="vertical" length={innerHeight} tickDirection={1} />
                     <g transform={`translate(0,${innerHeight})`}>
                         <Axis ticks={xTicks} orientation="horizontal" length={innerWidth} tickDirection={1} />
                     </g>

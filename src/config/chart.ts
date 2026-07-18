@@ -1,4 +1,4 @@
-export const CHART_MARGIN = { top: 20, right: 15, bottom: 40, left: 40 };
+export const CHART_MARGIN = { top: 20, right: 15, bottom: 40, left: 15 };
 export const CONTENT_MAX_WIDTH = 920;
 
 // Horizontal border of DayLengthChart's .panel (src/viz/DayLengthChart.module.css) — kept as a JS

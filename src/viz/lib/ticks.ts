@@ -20,9 +20,11 @@ export function generateTimeTicks(referenceDate: DateTime, width: number, stepHo
 export function generateAltitudeTicks(height: number, stepDeg: number, labelEveryNth: number): Tick[] {
     const ticks: Tick[] = []
     for (let deg = 0; deg <= 90; deg += stepDeg) {
+        // 0° sits right on the X axis line — labeling it would overlap the axis, so skip it.
+        const isLabeled = deg !== 0 && (deg / stepDeg) % labelEveryNth === 0
         ticks.push({
             position: scaleY(deg, height),
-            label: (deg / stepDeg) % labelEveryNth === 0 ? `${deg}°` : undefined
+            label: isLabeled ? `${deg}°` : undefined
         })
     }
     return ticks
