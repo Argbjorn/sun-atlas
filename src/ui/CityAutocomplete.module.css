@@ -1,9 +1,15 @@
 .wrapper {
     position: relative;
     width: 100%;
+    /* Flex items default to min-width:auto, which floors at the <input>'s intrinsic
+       size and ignores width:100% — this lets it overflow a narrow flex parent. */
+    min-width: 0;
 }
 
 .input {
+    -webkit-appearance: none;
+    appearance: none;
+    box-sizing: border-box;
     width: 100%;
     background: var(--color-panel-solid);
     border: 1px solid var(--color-panel-border);
@@ -16,6 +22,7 @@
 }
 
 .input:focus {
+    /* Only the color changes on focus — border-width stays 1px so nothing below reflows. */
     border-color: var(--color-accent-secondary);
 }
 
@@ -32,7 +39,6 @@
     border: 1px solid var(--color-panel-border);
     max-height: 220px;
     overflow-y: auto;
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
 }
 
 .suggestion {

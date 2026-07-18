@@ -4,9 +4,10 @@ import styles from "./CityAutocomplete.module.css"
 
 interface CityAutocompleteProps {
     onSelect: (feature: PhotonFeature) => void
+    onBlur?: () => void
 }
 
-function CityAutocomplete({ onSelect }: CityAutocompleteProps) {
+function CityAutocomplete({ onSelect, onBlur }: CityAutocompleteProps) {
     const [query, setQuery] = useState('');
     const [suggestions, setSuggestions] = useState<PhotonFeature[]>([]);
 
@@ -25,9 +26,9 @@ function CityAutocomplete({ onSelect }: CityAutocompleteProps) {
 
     return (
         <div className={styles.wrapper}>
-            <input className={styles.input} autoFocus value={query} onChange={e => setQuery(e.target.value)} />
+            <input className={styles.input} autoFocus value={query} onChange={e => setQuery(e.target.value)} onBlur={onBlur} />
             {suggestions.length > 0 && (
-                <ul className={styles.suggestions}>
+                <ul className={styles.suggestions} onMouseDown={e => e.preventDefault()}>
                     {suggestions.map(feature => (
                         <li className={styles.suggestion} key={feature.properties.osm_id} onClick={() => onSelect(feature)}>
                             {feature.properties.name}

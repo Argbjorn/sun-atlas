@@ -35,7 +35,7 @@ function LocationCard({ role, city, date, onSelect, onRemove }: LocationCardProp
             <div className={styles.card} ref={cardRef}>
                 {isSearching ? (
                     <div className={styles.searchOverlay}>
-                        <CityAutocomplete onSelect={onSelect} />
+                        <CityAutocomplete onSelect={onSelect} onBlur={() => setIsSearching(false)} />
                     </div>
                 ) : (
                     <button className={styles.placeholder} onClick={() => setIsSearching(true)}>

@@ -1,9 +1,9 @@
-export const CHART_MARGIN = { top: 20, right: 20, bottom: 40, left: 50 };
+export const CHART_MARGIN = { top: 20, right: 15, bottom: 40, left: 40 };
 export const CONTENT_MAX_WIDTH = 920;
 
-// Horizontal padding + border of DayLengthChart's .panel (src/viz/DayLengthChart.module.css) — kept
-// as a JS constant so the SVG width can be sized to fit exactly inside it. Update both together.
-export const CHART_PANEL_INSET = 16 * 2 + 1 * 2;
+// Horizontal border of DayLengthChart's .panel (src/viz/DayLengthChart.module.css) — kept as a JS
+// constant so the SVG width can be sized to fit exactly inside it. Update both together.
+export const CHART_PANEL_INSET = 1 * 2;
 
 // Chart height is derived from its width (not viewport height) so proportions stay
 // consistent regardless of screen aspect ratio. A single ratio looks right on a wide
