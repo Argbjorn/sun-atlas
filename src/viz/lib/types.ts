@@ -31,8 +31,3 @@ export interface Tick {
     position: number
     label?: string
 }
-
-export interface WindowSize {
-    width: number
-    height: number
-}

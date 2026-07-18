@@ -55,7 +55,7 @@ function LocationCard({ role, city, date, onSelect, onRemove }: LocationCardProp
     return (
         <div className={styles.card}>
             <div className={styles.header}>
-                <span className={styles.dot} style={{ color: city.color }}>●</span>
+                <span className={styles.dot} style={{ backgroundColor: city.color, boxShadow: `0 0 8px ${city.color}` }} />
                 <span className={styles.title}>
                     {city.feature.properties.name}
                     {city.feature.properties.country && `, ${city.feature.properties.country}`}
@@ -63,26 +63,28 @@ function LocationCard({ role, city, date, onSelect, onRemove }: LocationCardProp
                 <button className={styles.closeButton} onClick={onRemove}>×</button>
             </div>
 
-            <div className={styles.coords}>
-                {city.feature.geometry.coordinates[1].toFixed(2)}°, {city.feature.geometry.coordinates[0].toFixed(2)}°
-            </div>
+            <div className={styles.body}>
+                <div className={styles.coords}>
+                    {city.feature.geometry.coordinates[1].toFixed(2)}°, {city.feature.geometry.coordinates[0].toFixed(2)}°
+                </div>
 
-            <div className={styles.stats}>
-                <div className={styles.stat}>
-                    <span className={styles.statLabel}>Sunrise</span>
-                    <span className={styles.statValue}>{sunrise ? sunrise.toFormat('HH:mm') : '—'}</span>
-                </div>
-                <div className={styles.stat}>
-                    <span className={styles.statLabel}>Sunset</span>
-                    <span className={styles.statValue}>{sunset ? sunset.toFormat('HH:mm') : '—'}</span>
-                </div>
-                <div className={styles.stat}>
-                    <span className={styles.statLabel}>Solar noon</span>
-                    <span className={styles.statValue}>{solarNoonDeg !== null ? `${Math.round(solarNoonDeg)}°` : '—'}</span>
-                </div>
-                <div className={styles.stat}>
-                    <span className={styles.statLabel}>Day length</span>
-                    <span className={styles.statValue}>{dayLength ? dayLength.shiftTo('hours', 'minutes').toFormat("h'h' mm'm'") : '—'}</span>
+                <div className={styles.stats}>
+                    <div className={styles.stat}>
+                        <span className={styles.statLabel}>Sunrise</span>
+                        <span className={styles.statValue}>{sunrise ? sunrise.toFormat('HH:mm') : '—'}</span>
+                    </div>
+                    <div className={styles.stat}>
+                        <span className={styles.statLabel}>Sunset</span>
+                        <span className={styles.statValue}>{sunset ? sunset.toFormat('HH:mm') : '—'}</span>
+                    </div>
+                    <div className={styles.stat}>
+                        <span className={styles.statLabel}>Solar noon</span>
+                        <span className={styles.statValue}>{solarNoonDeg !== null ? `${Math.round(solarNoonDeg)}°` : '—'}</span>
+                    </div>
+                    <div className={styles.stat}>
+                        <span className={styles.statLabel}>Day length</span>
+                        <span className={styles.statValue}>{dayLength ? dayLength.shiftTo('hours', 'minutes').toFormat("h'h' mm'm'") : '—'}</span>
+                    </div>
                 </div>
             </div>
         </div>

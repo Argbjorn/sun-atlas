@@ -1,6 +1,6 @@
 .panel {
     border: 1px solid var(--color-panel-border);
-    background: #0a2138;
+    background: var(--color-panel-solid);
     padding: var(--spacing-3) var(--spacing-4) 0;
 }
 

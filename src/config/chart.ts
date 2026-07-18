@@ -4,3 +4,12 @@ export const CONTENT_MAX_WIDTH = 920;
 // Horizontal padding + border of DayLengthChart's .panel (src/viz/DayLengthChart.module.css) — kept
 // as a JS constant so the SVG width can be sized to fit exactly inside it. Update both together.
 export const CHART_PANEL_INSET = 16 * 2 + 1 * 2;
+
+// Chart height is derived from its width (not viewport height) so proportions stay
+// consistent regardless of screen aspect ratio. A single ratio looks right on a wide
+// desktop chart but goes tiny once the width shrinks on mobile, so below MOBILE_BREAKPOINT
+// (must match the breakpoint used in ControlPanel/LocationCard's CSS media queries) the
+// chart uses a taller ratio to stay legible.
+export const CHART_ASPECT_RATIO = 0.42;
+export const CHART_ASPECT_RATIO_MOBILE = 0.85;
+export const MOBILE_BREAKPOINT = 640;

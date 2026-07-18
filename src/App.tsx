@@ -1,13 +1,13 @@
 import styles from './App.module.css'
 import { DateTime } from 'luxon'
 import { getSunPositionSeries, type SunPosition } from './domain/sunTimes'
-import type { ChartPoint, CityEntry, PhotonFeature, WindowSize } from './viz/lib/types';
+import type { ChartPoint, CityEntry, PhotonFeature } from './viz/lib/types';
 import { toChartPoints } from './viz/lib/scale';
 import DayLengthChart from './viz/DayLengthChart';
 import { useEffect, useState } from 'react';
 import { generateAltitudeTicks, generateTimeTicks } from './viz/lib/ticks';
 import { randomColor } from './viz/lib/color';
-import { CHART_MARGIN, CHART_PANEL_INSET, CONTENT_MAX_WIDTH } from './config/chart';
+import { CHART_ASPECT_RATIO, CHART_ASPECT_RATIO_MOBILE, CHART_MARGIN, CHART_PANEL_INSET, CONTENT_MAX_WIDTH, MOBILE_BREAKPOINT } from './config/chart';
 import "react-datepicker/dist/react-datepicker.css";
 import ControlPanel from './ui/ControlPanel';
 
@@ -38,13 +38,13 @@ function App() {
     
   }
 
-  const [windowSize, setWindowSize] = useState<WindowSize>({ width: Math.min(window.innerWidth, CONTENT_MAX_WIDTH), height: window.innerHeight * 0.8 });
+  const [pageWidth, setPageWidth] = useState<number>(Math.min(window.innerWidth, CONTENT_MAX_WIDTH));
 
   useEffect(() => {
     let timeout: ReturnType<typeof setTimeout>;
     function handleResize() {
       timeout = setTimeout(() => {
-        setWindowSize({ width: Math.min(window.innerWidth, CONTENT_MAX_WIDTH), height: window.innerHeight * 0.8 })
+        setPageWidth(Math.min(window.innerWidth, CONTENT_MAX_WIDTH))
       }, 300)
     }
     window.addEventListener('resize', handleResize);
@@ -52,16 +52,16 @@ function App() {
       clearTimeout(timeout);
       window.removeEventListener('resize', handleResize);
     }
-  }, [windowSize]);
+  }, []);
 
-  const chartWidth = windowSize.width - CHART_PANEL_INSET;
-  const chartHeight = windowSize.height * 0.7;
+  const chartWidth = pageWidth - CHART_PANEL_INSET;
+  const chartHeight = chartWidth * (pageWidth < MOBILE_BREAKPOINT ? CHART_ASPECT_RATIO_MOBILE : CHART_ASPECT_RATIO);
   const innerWidth = chartWidth - CHART_MARGIN.left - CHART_MARGIN.right;
   const innerHeight = chartHeight - CHART_MARGIN.top - CHART_MARGIN.bottom;
 
   const charts: { points: ChartPoint[], stroke: string }[] = [];
 
-  const xTicks = generateTimeTicks(DateTime.fromJSDate(selectedDate), innerWidth, 1, 1);
+  const xTicks = generateTimeTicks(DateTime.fromJSDate(selectedDate), innerWidth, 1, 3);
   const yTicks = generateAltitudeTicks(innerHeight, 5, 2);
 
   [cities.primary, cities.secondary]
