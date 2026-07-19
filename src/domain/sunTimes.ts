@@ -10,6 +10,9 @@ export interface SunPosition {
 export function getSunPositionSeries(date: DateTime, lat: number, lon: number, stepMinutes: number): SunPosition[][] {
     const sunPositionSeries: SunPosition[][] = [];
     const sunIntervals = getSunIntervals(date, lat, lon);
+    console.log(`date: ${date}`);
+    console.log('sunIntervals');
+    console.log(sunIntervals);
     sunIntervals.forEach(sunInterval => {
         const sunPositionRange: SunPosition[] = []
         for (let time = sunInterval.start; time < sunInterval.end; time = time.plus({ minutes: stepMinutes })) {
@@ -17,13 +20,16 @@ export function getSunPositionSeries(date: DateTime, lat: number, lon: number, s
         };
         sunPositionRange.push({ time: sunInterval.end, altitudeDeg: SunCalc.getPosition(sunInterval.end.toJSDate(), lat, lon).altitude })
         sunPositionSeries.push(sunPositionRange);
-    })
+    });
+    console.log('sunPositionSeries');
+    console.log(sunPositionSeries);
     return sunPositionSeries;
 }
 
 export function getSunSummary(date: DateTime, lat: number, lon: number): {sunrise: DateTime | null, sunset: DateTime | null, solarNoonTime: DateTime | null, solarNoonDeg: number | null, dayLength: Duration | null } {
     const timeZone = tzLookup(lat, lon);
-    const sunTimes = SunCalc.getTimes(date.toJSDate(), lat, lon);
+    const localDate = anchorToZone(date, timeZone);
+    const sunTimes = SunCalc.getTimes(localDate.set({ hour: 12 }).toJSDate(), lat, lon);
     const sunrise = toZoned(sunTimes.sunrise, timeZone);
     const sunset = toZoned(sunTimes.sunset, timeZone);
     const solarNoonTime = toZoned(sunTimes.solarNoon, timeZone);
@@ -59,8 +65,9 @@ function isPolarDay(solarNoon: DateTime | null, lat: number, lon: number): boole
 
 function getSunIntervals(date: DateTime, lat: number, lon: number): { start: DateTime, end: DateTime }[] {
     const timeZone = tzLookup(lat, lon);
-    const sunTimes = SunCalc.getTimes(date.toJSDate(), lat, lon);
-    const sunTimesDayBefore = SunCalc.getTimes(date.minus({ days: 1 }).toJSDate(), lat, lon);
+    const localDate = anchorToZone(date, timeZone);
+    const sunTimes = SunCalc.getTimes(localDate.set({ hour: 12 }).toJSDate(), lat, lon);
+    const sunTimesDayBefore = SunCalc.getTimes(localDate.minus({ days: 1 }).set({ hour: 12 }).toJSDate(), lat, lon);
 
     const sunrise = toZoned(sunTimes.sunrise, timeZone);
     const sunset = toZoned(sunTimes.sunset, timeZone);
@@ -69,14 +76,14 @@ function getSunIntervals(date: DateTime, lat: number, lon: number): { start: Dat
     if (sunrise === null) {
         if (sunset === null) {
             if (isPolarDay(toZoned(sunTimes.solarNoon, timeZone), lat, lon)) {
-                const start = date.setZone(timeZone).startOf('day');
-                const end = date.setZone(timeZone).endOf('day');
+                const start = localDate.startOf('day');
+                const end = localDate.endOf('day');
                 return [{ start: start, end: end }]
             } else {
                 return []
             }
         }
-        const start = date.setZone(timeZone).startOf('day');
+        const start = localDate.startOf('day');
         const end = sunset;
         return [{ start: start, end: end }]
     }
@@ -86,12 +93,17 @@ function getSunIntervals(date: DateTime, lat: number, lon: number): { start: Dat
     const sunIntervals = []
 
     if (isSpillover) {
-        sunIntervals.push({ start: date.setZone(timeZone).startOf('day'), end: sunsetDayBefore });
+        sunIntervals.push({ start: localDate.startOf('day'), end: sunsetDayBefore });
     }
 
-    sunIntervals.push({ start: sunrise, end: resolveEnd(sunset, sunrise, date, timeZone) })
+    sunIntervals.push({ start: sunrise, end: resolveEnd(sunset, sunrise, localDate, timeZone) })
 
     return sunIntervals
+}
+
+/**Reconstructs the calendar day (Y/M/D) of `date` anchored in `zone`, so day-boundary math isn't skewed by date's original zone/instant */
+function anchorToZone(date: DateTime, zone: string): DateTime {
+    return DateTime.fromObject({ year: date.year, month: date.month, day: date.day }, { zone: zone });
 }
 
 function toZoned(date: Date | null, zone: string): DateTime | null {
