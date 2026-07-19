@@ -66,23 +66,19 @@
     background: var(--color-panel-border);
 }
 
-.tick {
+.tickMark {
     position: absolute;
     top: 0;
     transform: translateX(-50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--spacing-2);
-}
-
-.tickMark {
     width: 1px;
     height: 6px;
     background: var(--color-panel-border);
 }
 
 .tickLabel {
+    position: absolute;
+    top: calc(6px + var(--spacing-2));
+    transform: translateX(-50%);
     font-family: var(--font-mono);
     font-size: 10.5px;
     color: var(--color-text-faint);

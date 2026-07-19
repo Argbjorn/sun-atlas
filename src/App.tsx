@@ -6,7 +6,7 @@ import { toChartPoints } from './viz/lib/scale';
 import DayLengthChart from './viz/DayLengthChart';
 import { useEffect, useState } from 'react';
 import { generateAltitudeTicks, generateTimeTicks } from './viz/lib/ticks';
-import { randomColor } from './viz/lib/color';
+import { colorForRole } from './viz/lib/color';
 import { CHART_ASPECT_RATIO, CHART_ASPECT_RATIO_MOBILE, CHART_MARGIN, CHART_PANEL_INSET, CONTENT_MAX_WIDTH, MOBILE_BREAKPOINT } from './config/chart';
 import ControlPanel from './ui/ControlPanel';
 
@@ -28,12 +28,12 @@ function App() {
         ]
       }
     },
-    color: randomColor()
+    color: colorForRole('primary')
   }
   const [cities, setCities] = useState<{ primary: CityEntry | null, secondary: CityEntry | null }>({ primary: defaultCityEntry, secondary: null })
 
   function handleCitySelect(role: 'primary' | 'secondary', feature: PhotonFeature) {
-    setCities(prev => ({ ...prev, [role]: { feature, color: randomColor() } }))
+    setCities(prev => ({ ...prev, [role]: { feature, color: colorForRole(role) } }))
   }
 
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());

@@ -28,13 +28,19 @@ function DatePickerPanel({ selectedDate, onDateChange }: DatePickerPanelProps) {
     const daysInYear = DateTime.local(year, 12, 31).ordinal
     const dayFraction = (date.ordinal - 1) / (daysInYear - 1)
 
+    // 13 bounds: start of each month plus the end of the year, so a label can sit at the midpoint of its interval.
+    const monthBounds = Array.from({ length: 13 }, (_, i) => {
+        if (i === 12) return 1
+        const first = DateTime.local(year, i + 1, 1, { locale: "en-US" })
+        return (first.ordinal - 1) / (daysInYear - 1)
+    })
+
     const monthTicks = Array.from({ length: 12 }, (_, i) => {
-        const month = i + 1
-        const first = DateTime.local(year, month, 1, { locale: "en-US" })
+        const first = DateTime.local(year, i + 1, 1, { locale: "en-US" })
         return {
-            month,
+            month: i + 1,
             label: first.toFormat("LLL"),
-            fraction: (first.ordinal - 1) / (daysInYear - 1),
+            labelFraction: (monthBounds[i] + monthBounds[i + 1]) / 2,
         }
     })
 
@@ -88,11 +94,13 @@ function DatePickerPanel({ selectedDate, onDateChange }: DatePickerPanelProps) {
             <div className={styles.trackWrap}>
                 <div className={styles.track} ref={trackRef} onPointerDown={handleTrackPointerDown}>
                     <div className={styles.trackLine} />
+                    {monthBounds.map((fraction, i) => (
+                        <span key={i} className={styles.tickMark} style={{ left: `${fraction * 100}%` }} />
+                    ))}
                     {monthTicks.map(tick => (
-                        <div key={tick.month} className={styles.tick} style={{ left: `${tick.fraction * 100}%` }}>
-                            <span className={styles.tickMark} />
-                            <span className={styles.tickLabel}>{tick.label}</span>
-                        </div>
+                        <span key={tick.month} className={styles.tickLabel} style={{ left: `${tick.labelFraction * 100}%` }}>
+                            {tick.label}
+                        </span>
                     ))}
                     <div
                         className={styles.dot}

@@ -35,8 +35,17 @@ function DayLengthChart({ charts, xTicks, yTicks, width, height, margin }: DayLe
     const innerHeight = height - margin.top - margin.bottom
     return (
         <div className={styles.panel}>
-            <div className={styles.instrumentLabel}>Высота солнца, ° над горизонтом</div>
+            <div className={styles.instrumentLabel}>Sun altitude, °</div>
             <svg width={width} height={height}>
+                <defs>
+                    <filter id="dayLengthGlow" x="-50%" y="-50%" width="200%" height="200%">
+                        <feGaussianBlur stdDeviation="4" result="blur" />
+                        <feMerge>
+                            <feMergeNode in="blur" />
+                            <feMergeNode in="SourceGraphic" />
+                        </feMerge>
+                    </filter>
+                </defs>
                 <g transform={`translate(${margin.left},${margin.top})`}>
                     <ChartGrid
                         width={innerWidth}
@@ -51,7 +60,14 @@ function DayLengthChart({ charts, xTicks, yTicks, width, height, margin }: DayLe
                     />
                     {
                         charts.map((chart, index) => (
-                            <path d={pathFromPoints(chart.points)} stroke={chart.stroke} strokeWidth="2" fill="none" key={index} />
+                            <path
+                                d={pathFromPoints(chart.points)}
+                                stroke={chart.stroke}
+                                strokeWidth="2"
+                                fill="none"
+                                filter="url(#dayLengthGlow)"
+                                key={index}
+                            />
                         ))
                     }
                     <Axis ticks={yTicks} orientation="vertical" length={innerHeight} tickDirection={1} />
