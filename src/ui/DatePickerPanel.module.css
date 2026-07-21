@@ -36,9 +36,10 @@
     all: unset;
     cursor: pointer;
     font-family: var(--font-mono);
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 500;
     letter-spacing: 0.02em;
+    text-transform: uppercase;
     color: var(--color-text);
 }
 
