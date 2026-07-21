@@ -7,12 +7,9 @@ export interface SunPosition {
     altitudeDeg: number
 }
 
-export function getSunPositionSeries(date: DateTime, lat: number, lon: number, stepMinutes: number): SunPosition[][] {
+export function getSunPositionSeries(date: DateTime, lat: number, lon: number, stepMinutes: number, zone?: string): SunPosition[][] {
     const sunPositionSeries: SunPosition[][] = [];
-    const sunIntervals = getSunIntervals(date, lat, lon);
-    console.log(`date: ${date}`);
-    console.log('sunIntervals');
-    console.log(sunIntervals);
+    const sunIntervals = getSunIntervals(date, lat, lon, zone);
     sunIntervals.forEach(sunInterval => {
         const sunPositionRange: SunPosition[] = []
         for (let time = sunInterval.start; time < sunInterval.end; time = time.plus({ minutes: stepMinutes })) {
@@ -21,8 +18,6 @@ export function getSunPositionSeries(date: DateTime, lat: number, lon: number, s
         sunPositionRange.push({ time: sunInterval.end, altitudeDeg: SunCalc.getPosition(sunInterval.end.toJSDate(), lat, lon).altitude })
         sunPositionSeries.push(sunPositionRange);
     });
-    console.log('sunPositionSeries');
-    console.log(sunPositionSeries);
     return sunPositionSeries;
 }
 
@@ -63,8 +58,8 @@ function isPolarDay(solarNoon: DateTime | null, lat: number, lon: number): boole
     
 }
 
-function getSunIntervals(date: DateTime, lat: number, lon: number): { start: DateTime, end: DateTime }[] {
-    const timeZone = tzLookup(lat, lon);
+function getSunIntervals(date: DateTime, lat: number, lon: number, zone?: string): { start: DateTime, end: DateTime }[] {
+    const timeZone = zone ?? tzLookup(lat, lon);
     const localDate = anchorToZone(date, timeZone);
     const sunTimes = SunCalc.getTimes(localDate.set({ hour: 12 }).toJSDate(), lat, lon);
     const sunTimesDayBefore = SunCalc.getTimes(localDate.minus({ days: 1 }).set({ hour: 12 }).toJSDate(), lat, lon);

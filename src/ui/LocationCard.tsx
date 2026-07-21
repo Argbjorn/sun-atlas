@@ -11,9 +11,12 @@ interface LocationCardProps {
     date: DateTime
     onSelect: (feature: PhotonFeature) => void
     onRemove?: () => void
+    matchPrimaryTz?: boolean
+    onToggleMatchPrimaryTz?: () => void
+    primaryColor?: string
 }
 
-function LocationCard({ role, city, date, onSelect, onRemove }: LocationCardProps) {
+function LocationCard({ role, city, date, onSelect, onRemove, matchPrimaryTz, onToggleMatchPrimaryTz, primaryColor }: LocationCardProps) {
     const [isSearching, setIsSearching] = useState(false)
     const cardRef = useRef<HTMLDivElement>(null)
 
@@ -86,6 +89,29 @@ function LocationCard({ role, city, date, onSelect, onRemove }: LocationCardProp
                         <span className={styles.statValue}>{dayLength ? dayLength.shiftTo('hours', 'minutes').toFormat("h'h' mm'm'") : '—'}</span>
                     </div>
                 </div>
+
+                {role === 'secondary' && (
+                    <div className={styles.tzToggleRow}>
+                        <div className={styles.tzSegmented} role="group">
+                            <button
+                                className={styles.tzSegment}
+                                aria-pressed={!matchPrimaryTz}
+                                style={!matchPrimaryTz ? { background: city.color } : undefined}
+                                onClick={() => matchPrimaryTz && onToggleMatchPrimaryTz?.()}
+                            >
+                                Local timezone
+                            </button>
+                            <button
+                                className={styles.tzSegment}
+                                aria-pressed={matchPrimaryTz}
+                                style={matchPrimaryTz && primaryColor ? { background: primaryColor } : undefined}
+                                onClick={() => !matchPrimaryTz && onToggleMatchPrimaryTz?.()}
+                            >
+                                Primary timezone
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     )

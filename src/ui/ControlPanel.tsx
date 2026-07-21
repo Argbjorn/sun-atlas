@@ -10,9 +10,11 @@ interface ControlPanelProps {
     onCitySelect: (role: 'primary' | 'secondary', feature: PhotonFeature) => void
     onCityRemove: (role: 'primary' | 'secondary') => void
     onDateChange: (date: Date | null) => void
+    matchPrimaryTz: boolean
+    onToggleMatchPrimaryTz: () => void
 }
 
-function ControlPanel({ cities, selectedDate, onCitySelect, onCityRemove, onDateChange }: ControlPanelProps) {
+function ControlPanel({ cities, selectedDate, onCitySelect, onCityRemove, onDateChange, matchPrimaryTz, onToggleMatchPrimaryTz }: ControlPanelProps) {
     const date = DateTime.fromJSDate(selectedDate)
 
     return (
@@ -31,6 +33,9 @@ function ControlPanel({ cities, selectedDate, onCitySelect, onCityRemove, onDate
                     date={date}
                     onSelect={(feature) => onCitySelect('secondary', feature)}
                     onRemove={() => onCityRemove('secondary')}
+                    matchPrimaryTz={matchPrimaryTz}
+                    onToggleMatchPrimaryTz={onToggleMatchPrimaryTz}
+                    primaryColor={cities.primary?.color}
                 />
             </div>
             <DatePickerPanel selectedDate={selectedDate} onDateChange={onDateChange} />

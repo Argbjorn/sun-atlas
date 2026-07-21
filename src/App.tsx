@@ -1,5 +1,6 @@
 import styles from './App.module.css'
 import { DateTime } from 'luxon'
+import tzLookup from '@photostructure/tz-lookup'
 import { getSunPositionSeries, type SunPosition } from './domain/sunTimes'
 import type { ChartPoint, CityEntry, PhotonFeature } from './viz/lib/types';
 import { toChartPoints } from './viz/lib/scale';
@@ -31,6 +32,7 @@ function App() {
     color: colorForRole('primary')
   }
   const [cities, setCities] = useState<{ primary: CityEntry | null, secondary: CityEntry | null }>({ primary: defaultCityEntry, secondary: null })
+  const [matchPrimaryTz, setMatchPrimaryTz] = useState(false)
 
   function handleCitySelect(role: 'primary' | 'secondary', feature: PhotonFeature) {
     setCities(prev => ({ ...prev, [role]: { feature, color: colorForRole(role) } }))
@@ -80,10 +82,16 @@ function App() {
   const xTicks = generateTimeTicks(DateTime.fromJSDate(selectedDate), innerWidth, 1, 3);
   const yTicks = generateAltitudeTicks(innerHeight, 5, 2);
 
+  const primaryTz = cities.primary
+    ? tzLookup(cities.primary.feature.geometry.coordinates[1], cities.primary.feature.geometry.coordinates[0])
+    : null;
+
   [cities.primary, cities.secondary]
     .filter((city): city is CityEntry => city !== null)
-    .forEach((city) => {
-      const sunTimes: SunPosition[][] = getSunPositionSeries(DateTime.fromJSDate(selectedDate), city.feature.geometry.coordinates[1], city.feature.geometry.coordinates[0], 5);
+    .forEach((city, index) => {
+      const isSecondary = index === 1;
+      const zone = (isSecondary && matchPrimaryTz && primaryTz) ? primaryTz : undefined;
+      const sunTimes: SunPosition[][] = getSunPositionSeries(DateTime.fromJSDate(selectedDate), city.feature.geometry.coordinates[1], city.feature.geometry.coordinates[0], 5, zone);
       let chartPoints: ChartPoint[] = [];
       sunTimes.forEach(segment => {
         chartPoints = toChartPoints(segment, innerWidth, innerHeight);
@@ -99,6 +107,8 @@ function App() {
         onCitySelect={handleCitySelect}
         onCityRemove={handleCityRemove}
         onDateChange={handleChange}
+        matchPrimaryTz={matchPrimaryTz}
+        onToggleMatchPrimaryTz={() => setMatchPrimaryTz(prev => !prev)}
       />
       <DayLengthChart
         charts={charts}
