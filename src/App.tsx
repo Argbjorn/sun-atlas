@@ -56,6 +56,13 @@ function App() {
 
   }
 
+  function handleCitySwap() {
+    setCities(prev => ({
+      primary: prev.secondary ? { ...prev.secondary, color: colorForRole('primary') } : null,
+      secondary: prev.primary ? { ...prev.primary, color: colorForRole('secondary') } : null
+    }))
+  }
+
   const [pageWidth, setPageWidth] = useState<number>(Math.min(window.innerWidth, CONTENT_MAX_WIDTH));
 
   useEffect(() => {
@@ -106,6 +113,7 @@ function App() {
         selectedDate={selectedDate}
         onCitySelect={handleCitySelect}
         onCityRemove={handleCityRemove}
+        onCitySwap={handleCitySwap}
         onDateChange={handleChange}
         matchPrimaryTz={matchPrimaryTz}
         onToggleMatchPrimaryTz={() => setMatchPrimaryTz(prev => !prev)}

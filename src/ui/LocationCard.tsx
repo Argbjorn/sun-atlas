@@ -14,9 +14,10 @@ interface LocationCardProps {
     matchPrimaryTz?: boolean
     onToggleMatchPrimaryTz?: () => void
     primaryColor?: string
+    onSwapWithPrimary?: () => void
 }
 
-function LocationCard({ role, city, date, onSelect, onRemove, matchPrimaryTz, onToggleMatchPrimaryTz, primaryColor }: LocationCardProps) {
+function LocationCard({ role, city, date, onSelect, onRemove, matchPrimaryTz, onToggleMatchPrimaryTz, primaryColor, onSwapWithPrimary }: LocationCardProps) {
     const [isSearching, setIsSearching] = useState(false)
     const cardRef = useRef<HTMLDivElement>(null)
 
@@ -63,6 +64,9 @@ function LocationCard({ role, city, date, onSelect, onRemove, matchPrimaryTz, on
                     {city.feature.properties.name}
                     {city.feature.properties.country && `, ${city.feature.properties.country}`}
                 </span>
+                {role === 'secondary' && onSwapWithPrimary && (
+                    <button className={styles.swapButton} onClick={onSwapWithPrimary} aria-label="Swap with primary location">⇄</button>
+                )}
                 <button className={styles.closeButton} onClick={onRemove}>×</button>
             </div>
 
