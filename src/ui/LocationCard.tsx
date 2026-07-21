@@ -1,9 +1,18 @@
 import { useEffect, useRef, useState } from "react"
 import type { DateTime } from "luxon"
+import tzLookup from "@photostructure/tz-lookup"
 import type { CityEntry, PhotonFeature } from "../viz/lib/types"
 import { getSunSummary } from "../domain/sunTimes"
 import CityAutocomplete from "./CityAutocomplete"
 import styles from "./LocationCard.module.css"
+
+function formatUtcOffset(dt: DateTime): string {
+    const sign = dt.offset >= 0 ? '+' : '-'
+    const abs = Math.abs(dt.offset)
+    const hours = Math.floor(abs / 60)
+    const minutes = abs % 60
+    return `UTC${sign}${hours}${minutes ? ':' + String(minutes).padStart(2, '0') : ''}`
+}
 
 interface LocationCardProps {
     role: 'primary' | 'secondary'
@@ -56,11 +65,11 @@ function LocationCard({ role, city, date, onSelect, onRemove, matchPrimaryTz, on
         )
     }
 
-    const { sunrise, sunset, solarNoonDeg, dayLength } = getSunSummary(
-        date,
-        city.feature.geometry.coordinates[1],
-        city.feature.geometry.coordinates[0]
-    )
+    const lat = city.feature.geometry.coordinates[1]
+    const lon = city.feature.geometry.coordinates[0]
+    const { sunrise, sunset, solarNoonDeg, dayLength } = getSunSummary(date, lat, lon)
+    const timeZone = tzLookup(lat, lon)
+    const utcOffset = formatUtcOffset(date.setZone(timeZone))
 
     return (
         <div className={styles.card}>
@@ -78,7 +87,7 @@ function LocationCard({ role, city, date, onSelect, onRemove, matchPrimaryTz, on
 
             <div className={styles.body}>
                 <div className={styles.coords}>
-                    {city.feature.geometry.coordinates[1].toFixed(2)}°, {city.feature.geometry.coordinates[0].toFixed(2)}°
+                    {lat.toFixed(2)}°, {lon.toFixed(2)}° · {timeZone} ({utcOffset})
                 </div>
 
                 <div className={styles.stats}>
