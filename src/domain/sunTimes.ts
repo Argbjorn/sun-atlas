@@ -58,42 +58,47 @@ function isPolarDay(solarNoon: DateTime | null, lat: number, lon: number): boole
     
 }
 
+/**
+ * Builds sun-above-horizon intervals for the calendar day of `date` in `timeZone`.
+ * Sunrise/sunset are computed astronomically per-day and only afterwards clipped to the
+ * zone's day boundary — computing them relative to a single "local noon" (as before) breaks
+ * when `zone` is far from `lon`, since sunrise/sunset can then fall outside the nominal day
+ * they were computed for, or even precede it, producing an inverted (start > end) interval.
+ */
 function getSunIntervals(date: DateTime, lat: number, lon: number, zone?: string): { start: DateTime, end: DateTime }[] {
     const timeZone = zone ?? tzLookup(lat, lon);
     const localDate = anchorToZone(date, timeZone);
-    const sunTimes = SunCalc.getTimes(localDate.set({ hour: 12 }).toJSDate(), lat, lon);
-    const sunTimesDayBefore = SunCalc.getTimes(localDate.minus({ days: 1 }).set({ hour: 12 }).toJSDate(), lat, lon);
+    const dayStart = localDate.startOf('day');
+    const dayEnd = localDate.endOf('day');
 
-    const sunrise = toZoned(sunTimes.sunrise, timeZone);
-    const sunset = toZoned(sunTimes.sunset, timeZone);
-    const sunsetDayBefore = toZoned(sunTimesDayBefore.sunset, timeZone);
+    const candidateIntervals = [-1, 0, 1].flatMap(dayOffset => {
+        const day = localDate.plus({ days: dayOffset });
+        const sunTimes = SunCalc.getTimes(day.set({ hour: 12 }).toJSDate(), lat, lon);
+        const sunrise = toZoned(sunTimes.sunrise, timeZone);
+        const sunset = toZoned(sunTimes.sunset, timeZone);
 
-    if (sunrise === null) {
-        if (sunset === null) {
+        if (sunrise === null && sunset === null) {
             if (isPolarDay(toZoned(sunTimes.solarNoon, timeZone), lat, lon)) {
-                const start = localDate.startOf('day');
-                const end = localDate.endOf('day');
-                return [{ start: start, end: end }]
-            } else {
-                return []
+                return [{ start: dayStart, end: dayEnd }]
             }
+            return []
         }
-        const start = localDate.startOf('day');
-        const end = sunset;
-        return [{ start: start, end: end }]
-    }
+        if (sunrise === null) {
+            return [{ start: dayStart, end: sunset! }]
+        }
+        if (sunset === null) {
+            return [{ start: sunrise, end: dayEnd }]
+        }
+        return [{ start: sunrise, end: sunset }]
+    });
 
-    /**Returns true if yesterday sunset happens in the current day */
-    const isSpillover = sunsetDayBefore !== null && sunrise.hasSame(sunsetDayBefore, 'day');
-    const sunIntervals = []
-
-    if (isSpillover) {
-        sunIntervals.push({ start: localDate.startOf('day'), end: sunsetDayBefore });
-    }
-
-    sunIntervals.push({ start: sunrise, end: resolveEnd(sunset, sunrise, localDate, timeZone) })
-
-    return sunIntervals
+    return candidateIntervals
+        .map(({ start, end }) => ({
+            start: start < dayStart ? dayStart : start,
+            end: end > dayEnd ? dayEnd : end
+        }))
+        .filter(({ start, end }) => start < end)
+        .sort((a, b) => a.start.toMillis() - b.start.toMillis())
 }
 
 /**Reconstructs the calendar day (Y/M/D) of `date` anchored in `zone`, so day-boundary math isn't skewed by date's original zone/instant */
@@ -106,13 +111,5 @@ function toZoned(date: Date | null, zone: string): DateTime | null {
         return DateTime.fromJSDate(date, { zone: zone })
     } else {
         return null
-    }
-}
-
-function resolveEnd(sunset: DateTime | null, referenceMoment: DateTime, date: DateTime, timezone: string) {
-    if (sunset !== null && referenceMoment.hasSame(sunset, 'day')) {
-        return sunset
-    } else {
-        return date.setZone(timezone).endOf('day')
     }
 }
