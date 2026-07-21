@@ -37,6 +37,7 @@ function ControlPanel({ cities, selectedDate, onCitySelect, onCityRemove, onCity
                     matchPrimaryTz={matchPrimaryTz}
                     onToggleMatchPrimaryTz={onToggleMatchPrimaryTz}
                     primaryColor={cities.primary?.color}
+                    hasPrimary={!!cities.primary}
                     onSwapWithPrimary={cities.primary ? onCitySwap : undefined}
                 />
             </div>

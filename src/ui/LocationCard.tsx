@@ -15,11 +15,13 @@ interface LocationCardProps {
     onToggleMatchPrimaryTz?: () => void
     primaryColor?: string
     onSwapWithPrimary?: () => void
+    hasPrimary?: boolean
 }
 
-function LocationCard({ role, city, date, onSelect, onRemove, matchPrimaryTz, onToggleMatchPrimaryTz, primaryColor, onSwapWithPrimary }: LocationCardProps) {
+function LocationCard({ role, city, date, onSelect, onRemove, matchPrimaryTz, onToggleMatchPrimaryTz, primaryColor, onSwapWithPrimary, hasPrimary }: LocationCardProps) {
     const [isSearching, setIsSearching] = useState(false)
     const cardRef = useRef<HTMLDivElement>(null)
+    const isDisabled = role === 'secondary' && !hasPrimary
 
     useEffect(() => {
         if (!isSearching) {
@@ -42,7 +44,11 @@ function LocationCard({ role, city, date, onSelect, onRemove, matchPrimaryTz, on
                         <CityAutocomplete onSelect={onSelect} onBlur={() => setIsSearching(false)} />
                     </div>
                 ) : (
-                    <button className={styles.placeholder} onClick={() => setIsSearching(true)}>
+                    <button
+                        className={styles.placeholder}
+                        disabled={isDisabled}
+                        onClick={() => !isDisabled && setIsSearching(true)}
+                    >
                         {role === 'primary' ? 'Select location' : 'Select location to compare'}
                     </button>
                 )}
