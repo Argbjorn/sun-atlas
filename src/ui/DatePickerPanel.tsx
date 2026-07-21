@@ -81,7 +81,7 @@ function DatePickerPanel({ selectedDate, onDateChange }: DatePickerPanelProps) {
                 <button type="button" className={styles.arrow} onClick={() => shiftDay(-1)}>‹</button>
                 <Datepicker
                     selected={selectedDate}
-                    dateFormat="d MMMM yyyy"
+                    dateFormat="dd MMM yyyy"
                     calendarStartDay={1}
                     popperPlacement="bottom"
                     customInput={<DateLabel />}
