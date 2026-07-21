@@ -21,7 +21,7 @@ export function getSunPositionSeries(date: DateTime, lat: number, lon: number, s
     return sunPositionSeries;
 }
 
-export function getSunSummary(date: DateTime, lat: number, lon: number): {sunrise: DateTime | null, sunset: DateTime | null, solarNoonTime: DateTime | null, solarNoonDeg: number | null, dayLength: Duration | null } {
+export function getSunSummary(date: DateTime, lat: number, lon: number): { sunrise: DateTime | null, sunset: DateTime | null, solarNoonTime: DateTime | null, solarNoonDeg: number | null, dayLength: Duration | null } {
     const timeZone = tzLookup(lat, lon);
     const localDate = anchorToZone(date, timeZone);
     const sunTimes = SunCalc.getTimes(localDate.set({ hour: 12 }).toJSDate(), lat, lon);
@@ -41,6 +41,42 @@ export function getSunSummary(date: DateTime, lat: number, lon: number): {sunris
     }
 }
 
+export function getYearEvents(year: number): { marEquinox: DateTime, sepEquinox: DateTime, junSolstice: DateTime, decSolstice: DateTime } {
+    const y = (year - 2000) / 1000;
+    return {
+        marEquinox: julianDayToDate(getJDE0(y, 'mar')),
+        junSolstice: julianDayToDate(getJDE0(y, 'jun')),
+        sepEquinox: julianDayToDate(getJDE0(y, 'sep')),
+        decSolstice: julianDayToDate(getJDE0(y, 'dec')),
+    }
+}
+
+function getJDE0(y: number, season: 'mar' | 'jun' | 'sep' | 'dec'): number {
+    const seasonConst = {
+        mar: [2451623.80984, 365242.37404, 0.05169, -0.00411, -0.00057],
+        jun: [2451716.56767, 365241.62603, 0.00325, 0.00888, -0.00030],
+        sep: [2451810.21715, 365242.01767, -0.11575, 0.00337, 0.00078],
+        dec: [2451900.05952, 365242.74049, -0.06223, -0.00823, 0.00032],
+    }
+    const [c0, c1, c2, c3, c4] = seasonConst[season];
+    return c0 + c1 * y + c2 * y ** 2 + c3 * y ** 3 + c4 * y ** 4;
+}
+
+// Meeus, Astronomical Algorithms ch. 7 (Julian day -> Gregorian calendar date); valid for all dates this app deals with (post-1582)
+function julianDayToDate(jde: number): DateTime {
+    const Z = Math.floor(jde + 0.5);
+    const alpha = Math.floor((Z - 1867216.25) / 36524.25);
+    const A = Z + 1 + alpha - Math.floor(alpha / 4);
+    const B = A + 1524;
+    const C = Math.floor((B - 122.1) / 365.25);
+    const D = Math.floor(365.25 * C);
+    const E = Math.floor((B - D) / 30.6001);
+    const day = Math.floor(B - D - Math.floor(30.6001 * E));
+    const month = E < 14 ? E - 1 : E - 13;
+    const year = month > 2 ? C - 4716 : C - 4715;
+    return DateTime.utc(year, month, day);
+}
+
 function getDayLength(sunrise: DateTime | null, sunset: DateTime | null, isPolarDay: boolean): Duration | null {
     if (sunrise && sunset) {
         return sunset.diff(sunrise)
@@ -54,8 +90,8 @@ function isPolarDay(solarNoon: DateTime | null, lat: number, lon: number): boole
         return solarNoonAltitude > 0
     }
     return false
-    
-    
+
+
 }
 
 /**

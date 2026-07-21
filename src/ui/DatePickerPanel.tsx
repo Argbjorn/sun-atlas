@@ -2,6 +2,7 @@ import { forwardRef, useRef } from "react"
 import { DateTime } from "luxon"
 import Datepicker from "react-datepicker"
 import styles from "./DatePickerPanel.module.css"
+import { getYearEvents } from "../domain/sunTimes"
 
 interface DatePickerPanelProps {
     selectedDate: Date
@@ -44,6 +45,18 @@ function DatePickerPanel({ selectedDate, onDateChange }: DatePickerPanelProps) {
         }
     })
 
+    const yearEvents = getYearEvents(year)
+    const eventTicks = [
+        { key: "marEquinox", date: yearEvents.marEquinox, label: "Equinox" },
+        { key: "junSolstice", date: yearEvents.junSolstice, label: "Solstice" },
+        { key: "sepEquinox", date: yearEvents.sepEquinox, label: "Equinox" },
+        { key: "decSolstice", date: yearEvents.decSolstice, label: "Solstice" },
+    ].map(event => ({
+        ...event,
+        fraction: (event.date.ordinal - 1) / (daysInYear - 1),
+        isActive: event.date.year === date.year && event.date.month === date.month && event.date.day === date.day,
+    }))
+
     function shiftDay(offset: number) {
         onDateChange(date.plus({ days: offset }).toJSDate())
     }
@@ -61,6 +74,11 @@ function DatePickerPanel({ selectedDate, onDateChange }: DatePickerPanelProps) {
 
     function handleTrackPointerDown(e: React.PointerEvent<HTMLDivElement>) {
         onDateChange(dateFromFraction(fractionFromClientX(e.clientX)))
+    }
+
+    function handleEventPointerDown(e: React.PointerEvent<HTMLSpanElement>, eventDate: DateTime) {
+        e.stopPropagation()
+        onDateChange(eventDate.toJSDate())
     }
 
     function handleDotPointerDown(e: React.PointerEvent<HTMLDivElement>) {
@@ -100,6 +118,17 @@ function DatePickerPanel({ selectedDate, onDateChange }: DatePickerPanelProps) {
                     {monthTicks.map(tick => (
                         <span key={tick.month} className={styles.tickLabel} style={{ left: `${tick.labelFraction * 100}%` }}>
                             {tick.label}
+                        </span>
+                    ))}
+                    {eventTicks.map(event => (
+                        <span
+                            key={event.key}
+                            className={`${styles.eventMarker} ${event.isActive ? styles.eventMarkerActive : ""}`}
+                            style={{ left: `${event.fraction * 100}%` }}
+                            onPointerDown={e => handleEventPointerDown(e, event.date)}
+                        >
+                            <span className={styles.eventLabel}>{event.label}</span>
+                            <span className={styles.eventTick} />
                         </span>
                     ))}
                     <div
