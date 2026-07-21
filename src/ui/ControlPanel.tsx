@@ -11,11 +11,9 @@ interface ControlPanelProps {
     onCityRemove: (role: 'primary' | 'secondary') => void
     onCitySwap: () => void
     onDateChange: (date: Date | null) => void
-    matchPrimaryTz: boolean
-    onToggleMatchPrimaryTz: () => void
 }
 
-function ControlPanel({ cities, selectedDate, onCitySelect, onCityRemove, onCitySwap, onDateChange, matchPrimaryTz, onToggleMatchPrimaryTz }: ControlPanelProps) {
+function ControlPanel({ cities, selectedDate, onCitySelect, onCityRemove, onCitySwap, onDateChange }: ControlPanelProps) {
     const date = DateTime.fromJSDate(selectedDate)
 
     return (
@@ -34,9 +32,6 @@ function ControlPanel({ cities, selectedDate, onCitySelect, onCityRemove, onCity
                     date={date}
                     onSelect={(feature) => onCitySelect('secondary', feature)}
                     onRemove={() => onCityRemove('secondary')}
-                    matchPrimaryTz={matchPrimaryTz}
-                    onToggleMatchPrimaryTz={onToggleMatchPrimaryTz}
-                    primaryColor={cities.primary?.color}
                     hasPrimary={!!cities.primary}
                     onSwapWithPrimary={cities.primary ? onCitySwap : undefined}
                 />

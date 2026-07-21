@@ -14,6 +14,12 @@ interface DayLengthChartProps {
     width: number
     height: number
     margin: Margin
+    tzToggle?: {
+        matchPrimaryTz: boolean
+        onToggle: () => void
+        secondaryColor: string
+        primaryColor: string
+    }
 }
 
 function pathFromPoints(points: ChartPoint[]): string {
@@ -30,12 +36,34 @@ function pathFromPoints(points: ChartPoint[]): string {
     return path;
 }
 
-function DayLengthChart({ charts, xTicks, yTicks, width, height, margin }: DayLengthChartProps) {
+function DayLengthChart({ charts, xTicks, yTicks, width, height, margin, tzToggle }: DayLengthChartProps) {
     const innerWidth = width - margin.left - margin.right
     const innerHeight = height - margin.top - margin.bottom
     return (
         <div className={styles.panel}>
-            <div className={styles.instrumentLabel}>Sun altitude, °</div>
+            <div className={styles.panelHeader}>
+                <div className={styles.instrumentLabel}>Sun altitude, °</div>
+                {tzToggle && (
+                    <div className={styles.tzSegmented} role="group">
+                        <button
+                            className={styles.tzSegment}
+                            aria-pressed={!tzToggle.matchPrimaryTz}
+                            style={!tzToggle.matchPrimaryTz ? { background: tzToggle.secondaryColor } : undefined}
+                            onClick={() => tzToggle.matchPrimaryTz && tzToggle.onToggle()}
+                        >
+                            Own time zone
+                        </button>
+                        <button
+                            className={styles.tzSegment}
+                            aria-pressed={tzToggle.matchPrimaryTz}
+                            style={tzToggle.matchPrimaryTz ? { background: tzToggle.primaryColor } : undefined}
+                            onClick={() => !tzToggle.matchPrimaryTz && tzToggle.onToggle()}
+                        >
+                            Synced to primary
+                        </button>
+                    </div>
+                )}
+            </div>
             <svg width={width} height={height}>
                 <defs>
                     <filter id="dayLengthGlow" x="-50%" y="-50%" width="200%" height="200%">

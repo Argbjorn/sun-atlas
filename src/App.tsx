@@ -115,8 +115,6 @@ function App() {
         onCityRemove={handleCityRemove}
         onCitySwap={handleCitySwap}
         onDateChange={handleChange}
-        matchPrimaryTz={matchPrimaryTz}
-        onToggleMatchPrimaryTz={() => setMatchPrimaryTz(prev => !prev)}
       />
       <DayLengthChart
         charts={charts}
@@ -124,7 +122,13 @@ function App() {
         yTicks={yTicks}
         width={chartWidth}
         height={chartHeight}
-        margin={CHART_MARGIN} />
+        margin={CHART_MARGIN}
+        tzToggle={cities.secondary ? {
+          matchPrimaryTz,
+          onToggle: () => setMatchPrimaryTz(prev => !prev),
+          secondaryColor: cities.secondary.color,
+          primaryColor: cities.primary?.color ?? cities.secondary.color,
+        } : undefined} />
     </div>
   )
 }

@@ -20,14 +20,11 @@ interface LocationCardProps {
     date: DateTime
     onSelect: (feature: PhotonFeature) => void
     onRemove?: () => void
-    matchPrimaryTz?: boolean
-    onToggleMatchPrimaryTz?: () => void
-    primaryColor?: string
     onSwapWithPrimary?: () => void
     hasPrimary?: boolean
 }
 
-function LocationCard({ role, city, date, onSelect, onRemove, matchPrimaryTz, onToggleMatchPrimaryTz, primaryColor, onSwapWithPrimary, hasPrimary }: LocationCardProps) {
+function LocationCard({ role, city, date, onSelect, onRemove, onSwapWithPrimary, hasPrimary }: LocationCardProps) {
     const [isSearching, setIsSearching] = useState(false)
     const cardRef = useRef<HTMLDivElement>(null)
     const isDisabled = role === 'secondary' && !hasPrimary
@@ -108,29 +105,6 @@ function LocationCard({ role, city, date, onSelect, onRemove, matchPrimaryTz, on
                         <span className={styles.statValue}>{dayLength ? dayLength.shiftTo('hours', 'minutes').toFormat("h'h' mm'm'") : '—'}</span>
                     </div>
                 </div>
-
-                {role === 'secondary' && (
-                    <div className={styles.tzToggleRow}>
-                        <div className={styles.tzSegmented} role="group">
-                            <button
-                                className={styles.tzSegment}
-                                aria-pressed={!matchPrimaryTz}
-                                style={!matchPrimaryTz ? { background: city.color } : undefined}
-                                onClick={() => matchPrimaryTz && onToggleMatchPrimaryTz?.()}
-                            >
-                                Local timezone
-                            </button>
-                            <button
-                                className={styles.tzSegment}
-                                aria-pressed={matchPrimaryTz}
-                                style={matchPrimaryTz && primaryColor ? { background: primaryColor } : undefined}
-                                onClick={() => !matchPrimaryTz && onToggleMatchPrimaryTz?.()}
-                            >
-                                Primary timezone
-                            </button>
-                        </div>
-                    </div>
-                )}
             </div>
         </div>
     )
